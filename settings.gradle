@@ -3,18 +3,16 @@ pluginManagement {
     id 'biz.aQute.bnd.workspace' version bnd_version
   }
   repositories {
-    maven {
-      url = uri(bnd_snapshots)
-      content {
-        snapshotsOnly()
-        includeGroup('biz.aQute.bnd')
-        includeGroup('biz.aQute.bnd.workspace')
-      }
-    }
-    mavenCentral()
     gradlePluginPortal()
+    mavenCentral()
+    
+    maven {
+      url = uri("https://bndtools.jfrog.io/bndtools/libs-release")
+    }
   }
 }
+
 plugins {
+  id 'org.gradle.toolchains.foojay-resolver-convention' version '0.9.0'
   id 'biz.aQute.bnd.workspace'
 }

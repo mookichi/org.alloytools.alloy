@@ -25,6 +25,7 @@ import static kodkod.engine.bool.BooleanConstant.FALSE;
 import static kodkod.engine.bool.BooleanConstant.TRUE;
 import static kodkod.engine.bool.Operator.AND;
 import static kodkod.engine.bool.Operator.OR;
+import static kodkod.engine.bool.Operator.NOP;
 
 import java.util.Iterator;
 
@@ -943,7 +944,18 @@ public final class BooleanMatrix implements Iterable<IndexedEntry<BooleanValue>>
         ret.defCond().setOverflows(ret.defCond().getOverflow(), accum);
         return ret;
     }
-    
+    /**
+     * [mookichi] Virtual constraint for maxsat.
+     */
+    public final BooleanValue nop(Environment<?, ?> env) {
+        final BooleanAccumulator g = BooleanAccumulator.treeGate(NOP);
+        for(IndexedEntry<BooleanValue> e : cells) {
+            g.add(e.value());
+        }
+        final BooleanValue val = factory.accumulate(g);
+        return DefCond.ensureDef(factory, env, val, this.defCond());
+    }
+
     /**
      * Returns a BooleanValue that constrains at least one value in this.elements to be true.  The
      * effect of this method is the same as calling this.orFold().

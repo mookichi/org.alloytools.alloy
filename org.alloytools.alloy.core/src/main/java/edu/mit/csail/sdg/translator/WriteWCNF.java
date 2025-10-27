@@ -20,24 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.alloytools.solvers.natv.yices;
+package edu.mit.csail.sdg.translator;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import kodkod.engine.satlab.SATAbortedException;
+import kodkod.engine.satlab.SATFactory;
+import kodkod.engine.satlab.SATSolver;
 import kodkod.engine.satlab.WTargetSATSolver;
 
 /**
@@ -48,21 +44,16 @@ import kodkod.engine.satlab.WTargetSATSolver;
  *
  * @author Tiago Guimarães // [HASLab] target-oriented model finding
  */
-final class PMaxYicesExternal implements WTargetSATSolver {
+final class WriteWCNF implements WTargetSATSolver {
 
     private StringBuilder        buffer      = new StringBuilder();
     private final int            capacity    = 8192;
-    private final boolean        deleteTemp;
-    private final String         executable, inTemp;
-    private final String[]       options;
     private RandomAccessFile     cnf;
-    private final BitSet         solution;
-    private volatile Boolean     sat;
     private volatile int         vars, clauses;
-    private final int            max;
-    //expand int to long to allow large weights
+    private final long            max = 999999999999999999L;
     private Map<Integer,Long> softclauses = new HashMap<Integer,Long>();  // [HASLab]
     private List<int[]>          hardclauses = new ArrayList<int[]>();  // [HASLab]
+    private String               tmpFile;
 
     /**
      * Constructs an ExternalSolver that will execute the specified binary with the
@@ -72,22 +63,14 @@ final class PMaxYicesExternal implements WTargetSATSolver {
      * to standard out. The {@code deleteTemp} flag indicates whether the temporary
      * files should be deleted when they are no longer needed by this solver.
      */
-    PMaxYicesExternal(String executable, String inTemp, boolean deleteTemp, int max, String... options) {
-        this.deleteTemp = deleteTemp;
-        this.sat = null;
-        this.solution = new BitSet();
+    WriteWCNF() {
         this.vars = 0;
         this.clauses = 0;
-        this.max = max;
-        this.executable = executable;
-        this.inTemp = inTemp;
         // remove empty strings from the options array
-        final List<String> nonEmpty = new ArrayList<String>(options.length);
-        for (String opt : options) {
-            if (!opt.isEmpty())
-                nonEmpty.add(opt);
-        }
-        this.options = nonEmpty.toArray(new String[nonEmpty.size()]);
+    }
+    WriteWCNF(String filename) {
+        this();
+        this.tmpFile = filename;
     }
 
     /**
@@ -133,8 +116,8 @@ final class PMaxYicesExternal implements WTargetSATSolver {
      * @see kodkod.engine.satlab.SATSolver#addClause(int[])
      */
     public boolean addClause(int[] lits) {
-        clauses++;
         hardclauses.add(lits.clone());
+        clauses++;
         return true;
     }
 
@@ -145,13 +128,12 @@ final class PMaxYicesExternal implements WTargetSATSolver {
     }
 
     public boolean addTarget(int lit) {
-        return addWeight(lit, 1);
+        return addWeight(lit, 1L);
     }
 
-    //expand int to long to allow large weights
     public boolean addWeight(int lit, long weight) {
-        clauses++;
         softclauses.put(lit, weight);
+        clauses++;
         return true;
     }
 
@@ -160,9 +142,6 @@ final class PMaxYicesExternal implements WTargetSATSolver {
      */
     public synchronized void free() {
         close(cnf);
-        if (deleteTemp) {
-            (new File(inTemp)).delete();
-        }
     }
 
     /**
@@ -170,7 +149,7 @@ final class PMaxYicesExternal implements WTargetSATSolver {
      */
     @Override
     protected final void finalize() throws Throwable {
-        super.finalize();
+        // super.finalize();
         free();
     }
 
@@ -186,25 +165,11 @@ final class PMaxYicesExternal implements WTargetSATSolver {
         return softclauses.size();
     }
 
-    /**
-     * @ensures |lit| <= this.vars && lit != 0 => this.solution'.set(|lit|, lit>0)
-     * @throws SATAbortedException lit=0 || |lit|>this.vars
-     */
-    private final void updateSolution(int lit) {
-        int abs = StrictMath.abs(lit);
-        if (abs <= vars && abs > 0)
-            solution.set(abs - 1, lit > 0);
-        else
-            throw new SATAbortedException("Invalid variable value: |" + lit + "| !in [1.." + vars + "]");
-    }
-
-
-
     public boolean solve() throws SATAbortedException {
 
         RandomAccessFile file = null;
         try {
-            file = new RandomAccessFile(inTemp, "rw");
+            file = new RandomAccessFile(tmpFile, "rw");
             file.setLength(0);
         } catch (FileNotFoundException e) {
             throw new SATAbortedException(e);
@@ -244,125 +209,54 @@ final class PMaxYicesExternal implements WTargetSATSolver {
             buffer.append("0\n");
         }
 
-        //		if (sat==null) {
         flush();
         Process p = null;
-        BufferedReader out = null;
         try {
             cnf.seek(0);
             cnf.writeBytes("p wcnf " + vars + " " + (clauses) + " " + max);
             cnf.close();
-
-            final String[] command = new String[options.length + 2];
-            command[0] = executable;
-            System.arraycopy(options, 0, command, 1, options.length);
-            command[command.length - 1] = inTemp;
-            p = Runtime.getRuntime().exec(command);
-            System.out.println(Arrays.asList(command).toString());
-
-            new Thread(drain(p.getErrorStream())).start();
-            out = outputReader(p);
-            String line = null;
-            while ((line = out.readLine()) != null) {
-                System.out.println(line);
-                String[] tokens = line.split("\\s");
-                int tlength = tokens.length;
-                if (tlength > 0) {
-                    //						if (tokens[0].compareToIgnoreCase("s")==0) {
-                    //							if (tlength==3 && tokens[1].compareToIgnoreCase("OPTIMUM")==0 && tokens[2].compareToIgnoreCase("FOUND")==0) {
-                    //								sat = Boolean.TRUE;
-                    //								continue;
-                    //							} else if (tlength==2 && tokens[1].compareToIgnoreCase("UNSATISFIABLE")==0) {
-                    //								sat = Boolean.FALSE;
-                    //								continue;
-                    //							}
-                    //							throw new SATAbortedException("Invalid " + executable + " output. Line: " + line);
-                    if (tokens[0].equals("sat")) {
-                        sat = Boolean.TRUE;
-                        continue;
-                    } else if (tokens[0].equals("cost:")) {
-                    } else { //if (tokens[0].compareToIgnoreCase("v")==0) {
-                        int last = vars;
-                        for (int i = 0; i < last; i++) {
-                            updateSolution(Integer.parseInt(tokens[i]));
-                        }
-                        //							int lit = Integer.parseInt(tokens[last]);
-                        //							if (lit!=0) updateSolution(lit);
-                        //							else if (sat!=null) break;
-                    } // not a solution line or a variable line, so ignore it.
-                }
-            }
-            if (sat == null) {
-                throw new SATAbortedException("Invalid " + executable + " output: no line specifying the outcome.");
-            }
         } catch (IOException e) {
             throw new SATAbortedException(e);
-        } catch (NumberFormatException e) {
-            throw new SATAbortedException("Invalid " + executable + " output: encountered a non-integer variable token.", e);
         } finally {
             close(cnf);
-            close(out);
         }
-        //		}
-        return sat;
+        return false;
     }
-
-    /**
-     * Returns a runnable that drains the specified input stream.
-     *
-     * @return a runnable that drains the specified input stream.
-     */
-    private static Runnable drain(final InputStream input) {
-        return new Runnable() {
-
-            public void run() {
-                try {
-                    final byte[] buffer = new byte[8192];
-                    while (true) {
-                        int n = input.read(buffer);
-                        if (n < 0)
-                            break;
-                    }
-                } catch (IOException ex) {
-                } finally {
-                    close(input);
-                }
-            }
-        };
-    }
-
-    /**
-     * Returns a reader for reading the output of the given process.
-     *
-     * @return a reader for reading the output of the given process.
-     * @throws IOException
-     */
-    private BufferedReader outputReader(Process p) throws IOException {
-        try {
-            return new BufferedReader(new InputStreamReader(p.getInputStream(), "ISO-8859-1"));
-        } catch (IOException e) {
-            close(p.getInputStream());
-            throw e;
-        }
-    }
-
-    public boolean valueOf(int variable) {
-        if (!Boolean.TRUE.equals(sat))
-            throw new IllegalStateException();
-        if (variable < 1 || variable > vars)
-            throw new IllegalArgumentException(variable + " !in [1.." + vars + "]");
-        return solution.get(variable - 1);
-    }
-
+    
     @Override
-    public String toString() {
-        return executable + " " + options;
+    public boolean valueOf(int variable) {
+        throw new IllegalStateException("This solver just writes the CNF without solving them.");
     }
 
     public boolean clearTargets() {
         clauses = clauses - softclauses.size();
-        //expand int to long to allow large weights
         softclauses = new HashMap<Integer,Long>();
-        return Boolean.TRUE.equals(sat);
+        return Boolean.TRUE;
+    }
+
+    /**
+     * Helper method that returns a factory for WriteCNF instances.
+     */
+    public static final SATFactory factory(final String filename) {
+        return new SATFactory() {
+
+            private static final long serialVersionUID = 1L;
+
+            /** {@inheritDoc} */
+            @Override
+            public SATSolver createSolver() {
+                return new WriteWCNF(filename);
+            }
+
+            @Override
+            public String id() {
+                return "writewcnf";
+            }
+
+            @Override
+            public String type() {
+                return "synthetic";
+            }
+        };
     }
 }

@@ -31,8 +31,10 @@ import kodkod.engine.bool.ITEGate;
 import kodkod.engine.bool.MultiGate;
 import kodkod.engine.bool.NotGate;
 import kodkod.engine.bool.Operator;
+import kodkod.engine.bool.Operator.Nary;
 import kodkod.engine.satlab.SATFactory;
 import kodkod.engine.satlab.SATSolver;
+import kodkod.engine.satlab.WTargetSATSolver;
 import kodkod.util.ints.IntSet;
 import kodkod.util.ints.IntTreeSet;
 
@@ -233,6 +235,10 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 	 * its input literal, as described above.
 	 */
 	public final int[] visit(MultiGate multigate, Object arg) {  
+		if (multigate.getPriority() != 0 && !(solver instanceof WTargetSATSolver)) {
+			throw new IllegalStateException(
+					"To use minimal/maximal operator, the solver should be a MaxSAT solver!");
+		}
 		final int oLit = multigate.label();
 		if (visited.add(oLit)) { 
 			final int sgn; final boolean p, n;
@@ -250,10 +256,19 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 					solver.addClause(clause(iLit * sgn, output));
 				}
 				if (n) { 
-					lastClause[i++] = iLit * -sgn;
+					if (multigate.getPriority() != 0) {
+						// if multigate has maxsat priority
+						if (multigate.getPriority() < 0) { // minimal
+							((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority());
+						} else if (multigate.getPriority() > 0) { // maximal
+							((WTargetSATSolver) solver).addWeight(iLit, multigate.getPriority());
+						}
+					} else {
+						lastClause[i++] = iLit * -sgn;
+					}
 				}
 			}
-			if (n) {
+			if (n && multigate.op() != Nary.NOP) {
 				lastClause[i] = oLit * sgn;
 				solver.addClause(lastClause);
 			}

@@ -69,4 +69,22 @@ public abstract class BooleanValue implements Comparable<BooleanValue> {
 	public final int compareTo(BooleanValue other) {
 		return label() - other.label();
 	}
+	/**
+	 * maxsat priority
+	 */
+	private long priority = 0;
+	/**
+	 * get maxsat priority
+	 *  @return priority
+	 */
+	public long getPriority() {
+		return priority;
+	}
+	/**
+	 * set maxsat priority
+	 * @param priority
+	 */
+	public void setPriority(long priority) {
+		this.priority = priority;
+	}
 }

@@ -649,7 +649,9 @@ public final class CompModule extends Browsable implements Module {
             for (Decl d : decls.makeConst())
                 for (ExprHasName v : d.names)
                     remove(v.label);
-            return x.op.make(x.pos, x.closingBracket, decls.makeConst(), sub);
+            Expr ret =  x.op.make(x.pos, x.closingBracket, decls.makeConst(), sub);
+            ret.setPriority(x.getPriority());
+            return ret;
         }
 
         /** {@inheritDoc} */
@@ -669,7 +671,9 @@ public final class CompModule extends Browsable implements Module {
         /** {@inheritDoc} */
         @Override
         public Expr visit(ExprUnary x) throws Err {
-            return x.op.make(x.pos, visitThis(x.sub));
+            Expr ex = x.op.make(x.pos, visitThis(x.sub));
+            ex.setPriority(x.getPriority());
+            return ex;
         }
 
         /** {@inheritDoc} */

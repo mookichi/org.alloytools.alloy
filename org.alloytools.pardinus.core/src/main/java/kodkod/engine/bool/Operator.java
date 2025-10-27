@@ -33,7 +33,7 @@ import java.util.Iterator;
  */
 public abstract class Operator implements Comparable<Operator>{
 	final int ordinal;
-	
+
 	private Operator(int ordinal) {	
 		this.ordinal = ordinal;
 	}
@@ -56,7 +56,7 @@ public abstract class Operator implements Comparable<Operator>{
 	public int compareTo(Operator op) {
 		return ordinal() - op.ordinal();
 	}
-	
+
 	/**
 	 * N-ary {@link MultiGate AND} operator.
 	 */
@@ -82,7 +82,20 @@ public abstract class Operator implements Comparable<Operator>{
 		/** @return AND */
 		public Nary complement() {  return AND; }
 	};
-	
+		
+	/**
+	 * N-ary {@link MultiGate NOP} operator.
+	 */
+	public static final Nary NOP = new Nary(2) {
+		public String toString() { return ","; }
+		/** @return true */
+		public BooleanConstant identity() { return BooleanConstant.TRUE; }
+		/** @return false */
+		public BooleanConstant shortCircuit() { return null; }
+		/** @return OR */
+		public Nary complement() {  return null; }
+	};
+
 	/**
 	 * Ternary {@link ITEGate if-then-else} operator.
 	 */

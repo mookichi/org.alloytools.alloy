@@ -97,11 +97,13 @@ final class PMaxYicesNative extends NativeSolver implements WTargetSATSolver {
     }
 
     @Override
-    public boolean addWeight(int lit, int weight) {
+    //expand int to long to allow large weights
+    public boolean addWeight(int lit, long weight) {
         return addWeight(super.peer(), lit, weight, array);
     }
 
-    native boolean addWeight(long peer, int lit, int weight, long array);
+    //expand int to long to allow large weights
+    native boolean addWeight(long peer, int lit, long weight, long array);
 
     @Override
     public native boolean valueOf(long peer, int literal);

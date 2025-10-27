@@ -105,7 +105,19 @@ public abstract class Expr extends Browsable {
     /** This is an unmodifiable empty list of Err objects. */
     static final JoinableList<Err> emptyListOfErrors = new JoinableList<Err>();
 
+    /**soft weight for maxsat */
+    private long priority = 0L;
     // ================================================================================================================//
+
+    /**get maxsat priority */
+    public long getPriority() {
+        return priority;
+    }
+
+    /**set maxsat priority */
+    public void setPriority(long priority) {
+        this.priority = priority;
+    }
 
     /**
      * Constructs a new expression node

@@ -53,7 +53,8 @@ final public class PMaxSAT4J implements WTargetSATSolver {
 	private Boolean sat;
 	private int vars, clauses;
 	private Set<int[]> hardclauses = new HashSet<int[]>();
-	private Map<Integer,Integer> softclauses = new HashMap<Integer,Integer>();
+	// expand int to long to allow large weights
+	private Map<Integer, Long> softclauses = new HashMap<Integer, Long>();
 	/**
 	 * Constructs a wrapper for the given instance of ISolver.
 	 * 
@@ -131,8 +132,9 @@ final public class PMaxSAT4J implements WTargetSATSolver {
 	 * {@inheritDoc}
 	 * @see kodkod.pardinus.target.TargetOrientedSATSolver#addWeight(int,int)
 	 */
-	public boolean addWeight(int lit, int weight) {
-		softclauses.put(lit,weight);
+	//expand int to long to allow large weights
+	public boolean addWeight(int lit, long weight) {
+		softclauses.put(lit, weight);
 		clauses++;
 		return true;
 	}
@@ -145,14 +147,16 @@ final public class PMaxSAT4J implements WTargetSATSolver {
 
 	public boolean solve() {
 		solver.reset();
-		solver.setTopWeight(BigInteger.valueOf(10000));
+		// to allow large weights
+		solver.setTopWeight(BigInteger.valueOf(999999999999999999L));
 		solver.setExpectedNumberOfClauses(clauses);
 		solver.newVar(vars);
 		solver.setTimeout(1000);
 		try {
 			// add the target variables as soft clauses
 			for (Integer x : softclauses.keySet())
-				solver.addSoftClause(softclauses.get(x),wrapper.wrap(new int[] { x }));
+				//expand int to long to allow large weights. the API permits BigInteger and int only
+				solver.addSoftClause(BigInteger.valueOf(softclauses.get(x)),wrapper.wrap(new int[] { x }));
 			// add the problem variables as hard clauses
 			for (int[] x : hardclauses)
 				solver.addHardClause(wrapper.wrap(x));
@@ -417,7 +421,8 @@ final public class PMaxSAT4J implements WTargetSATSolver {
 	 */
 	public boolean clearTargets() {
 		clauses = clauses - numberOfTargets();
-		softclauses = new HashMap<Integer, Integer>();
+		//expand int to long to allow large weights
+		softclauses = new HashMap<Integer, Long>();
 		return Boolean.TRUE.equals(sat);
 	}
 

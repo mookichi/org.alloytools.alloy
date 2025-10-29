@@ -103,27 +103,26 @@ public abstract class Expr extends Browsable {
     private Clause                 referenced;
 
     /**
-     * The most significant bit (msb) value associated with this variable.
-     * Initialized to -1 to indicate that it has not been set.
+     * The Size of this expression. -1 means unknown. Non-negative values are
+     * the actual sizes.
      */
-    private int msb = -1;
+    private int size = -1;
 
     /**
-     * Returns the most significant bit (MSB) value associated with this variable.
-     *
-     * @return the MSB value as an integer
+     * Returns the number of elements bound by this expression.
+     * @return  the number of bound elements for this expression
      */
-    public int getMsb() {
-        return msb;
+    public int getSize() {
+        return size;
     }
 
     /**
-     * Sets the most significant bit (msb) value for this variable expression.
-     *
-     * @param msb the value to set as the most significant bit
+     * Sets the number of elements bound by this expression.
+     * @param size
      */
-    public void setMsb(int msb) {
-        this.msb = msb;
+    public void setSize(int size) {
+        assert(this.size == -1);
+        this.size = size;
     }
 
     /** This is an unmodifiable empty list of Err objects. */

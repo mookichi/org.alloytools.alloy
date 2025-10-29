@@ -300,6 +300,13 @@ public final class ExprBinary extends Expr {
          * @param right - the right hand side expression
          */
         public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right) {
+            int size = -1;
+            if (left.getSize() > size) {
+                size = left.getSize();
+            }
+            if (right.getSize() > size) {
+                size = right.getSize();
+            }
             switch (this) {
                 case AND :
                     return ExprList.makeAND(pos, closingBracket, left, right);
@@ -462,7 +469,11 @@ public final class ExprBinary extends Expr {
                 errs = errs.make(new ErrorSyntax(left.span(), "Multiplicity expression not allowed here."));
             if ((isArrow && right.mult == 1) || (!isArrow && this != Op.IN && right.mult != 0))
                 errs = errs.make(new ErrorSyntax(right.span(), "Multiplicity expression not allowed here."));
-            return new ExprBinary(pos, closingBracket, this, left, right, type, errs.make(e));
+            Expr ret = new ExprBinary(pos, closingBracket, this, left, right, type, errs.make(e));
+            if (size >= 0) {
+                ret.setSize(size);
+            }
+            return ret;
         }
 
         /** Returns the human readable label for this operator. */

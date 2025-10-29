@@ -134,9 +134,11 @@ final class ScopeComputer {
     /** Returns the scope for a sig (or -1 if we don't know). */
     public int sig2scope(Sig sig) {
         if (sig == SIGINT)
-            return 1 << bitwidth;
+            return bitwidth;
+        if (Sig.getSubInts().containsValue(sig))
+            return sig.getSize();
         if (sig == SEQIDX)
-            return maxseq;
+        return maxseq;
         if (sig == STRING)
             return maxstring;
         Integer y = sig2scope.get(sig);

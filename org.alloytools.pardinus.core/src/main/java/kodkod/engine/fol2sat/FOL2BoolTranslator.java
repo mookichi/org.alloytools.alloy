@@ -177,17 +177,23 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 					final BooleanFactory factory = super.interpreter.factory();
 					ret = factory.matrix(Dimensions.square(super.interpreter.universe().size(), 1));
 					final IntSet ints = super.interpreter.ints();
-					final int msb = factory.bitwidth()-1;
+					int size = -1;
+					if (castExpr.intExpr() instanceof ExprToIntCast) {
+						size = ((ExprToIntCast) castExpr.intExpr()).expression().getSize() - 1;
+					}
+					if (size < 0) {
+						size = factory.bitwidth()-1;
+					}
 					// handle all bits but the sign bit
-					for(int i = 0; i < msb; i++) { 
-						int pow2 = 1<<i;
-						if (ints.contains(pow2)) { 
-							ret.set(super.interpreter.interpret(pow2), BooleanConstant.TRUE);
+					for(int i = 0; i < size; i++) { 
+						// int pow2 = 1<<i;
+						if (ints.contains(i)) { 
+							ret.set(super.interpreter.interpret(i), BooleanConstant.TRUE);
 						}
 					}
 					// handle the sign bit
-					if (ints.contains(-1<<msb)) {
-						ret.set(super.interpreter.interpret(-1<<msb), BooleanConstant.TRUE);
+					if (ints.contains(size)) {
+						ret.set(super.interpreter.interpret(size), BooleanConstant.TRUE);
 					}
 					return cache(castExpr, ret);
 				default : throw new IllegalArgumentException("Unknown operator: " + castExpr.op());
@@ -822,7 +828,13 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 			break;
 		case BITSETCAST : 
 			final List<BooleanValue> twosComplement = child.twosComplementBits();
-			final int msb = twosComplement.size()-1;
+			int msb = -1;
+			if (castExpr.intExpr() instanceof ExprToIntCast) {
+				msb = ((ExprToIntCast) castExpr.intExpr()).expression().getSize() - 1;
+			}
+			if (msb < 0) {
+				msb = twosComplement.size()-1;
+			}
 			// handle all bits but the sign bit
 			for(int i = 0; i < msb; i++) { 
 				// map bitvector
@@ -831,8 +843,8 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 				}
 			}
 			// handle the sign bit
-			if (ints.contains(-1<<msb)) {
-				ret.set(interpreter.interpret(-1<<msb), twosComplement.get(msb));
+			if (ints.contains(msb)) {
+				ret.set(interpreter.interpret(msb), twosComplement.get(msb));
 			}
 			break;
 		default : 
@@ -911,7 +923,7 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 			ret = expr.cardinality(); break;
 		case SUM         :
 			final IntSet ints = interpreter.ints();
-			ret = sum(expr, ints.iterator(), 0, ints.size()-1); break;
+			ret = sum(expr, ints.iterator(ints.min(), intExpr.expression().getSize() - 1), 0, intExpr.expression().getSize()-1); break;
 		default: 
 			throw new IllegalArgumentException("unknown operator: " + intExpr.op());
 		}

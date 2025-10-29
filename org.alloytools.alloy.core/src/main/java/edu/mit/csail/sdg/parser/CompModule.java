@@ -1217,8 +1217,8 @@ public final class CompModule extends Browsable implements Module {
             return UNIV;
         if (name.equals("Int"))
             return SIGINT;
-        if (name.matches("Int/\\d+"))
-            return SIGINT;
+        if (name.matches("Int/\\d+$"))
+            return Sig.subInt(name);
         if (name.equals("seq/Int"))
             return SEQIDX;
         if (name.equals("String"))
@@ -1516,14 +1516,17 @@ public final class CompModule extends Browsable implements Module {
             List<Sig> newParents = new ArrayList<Sig>(parents == null ? 0 : parents.size());
             if (parents == null)
                 parents = Arrays.asList();
-            int msb = -1;
+            int size = -1;
             for (ExprVar p : parents) {
                 newParents.add(new PrimSig(p.label, WHERE.make(p.pos)));
-                if (msb < p.getMsb())
-                    msb = p.getMsb();
+                if (size < p.getSize()){
+                    size = p.getSize();
+                }
             }
             obj = new SubsetSig(namePos, full, parents.stream().map(p -> p.pos).collect(Collectors.toList()), newParents, attributes);
-            obj.setMsb(msb);
+            if (size >= 0) {
+                obj.setSize(size);
+            }
         } else {
             attributes = Util.append(attributes, SUBSIG.makenull(subsig));
             PrimSig newParent = (parents != null && parents.size() > 0) ? (new PrimSig(parents.get(0).label, WHERE.make(parents.get(0).pos))) : UNIV;
@@ -1531,6 +1534,11 @@ public final class CompModule extends Browsable implements Module {
             obj = new PrimSig(namePos, full, parentPos, newParent, attributes);
         }
         sigs.put(name, obj);
+        for (Decl f : fields) {
+            if (f.expr instanceof ExprUnary && ((ExprUnary) f.expr).sub.getSize() >= 0) {
+                f.setSize(((ExprUnary) f.expr).sub.getSize());
+            }
+        }
         old2fields.put(obj, fields);
         old2appendedfacts.put(obj, fact);
         return obj;
@@ -1561,7 +1569,7 @@ public final class CompModule extends Browsable implements Module {
         // * a static sig should NOT be included in a variable sig [electrum]
         // * a static sig should NOT extend a variable sig [electrum]
         // * a variable sig should NOT extend a static sig [electrum]
-        if (res.new2old.containsKey(oldS))
+        if (oldS.builtin || res.new2old.containsKey(oldS))
             return oldS;
         Sig realSig;
         final Pos pos = oldS.pos;
@@ -1580,8 +1588,9 @@ public final class CompModule extends Browsable implements Module {
                 parents.add(resolveSig(res, topo, parentAST, warns));
             }
             realSig = new SubsetSig(oldSS.pos, fullname, oldSS.parentRefPoss, parents, oldS.attributes.toArray(new Attr[0]));
-            if (oldS.getMsb() >= 0)
-                realSig.setMsb(oldS.getMsb());
+            if (oldS.getSize() >= 0) {
+                realSig.setSize(oldS.getSize());
+            }
             for (Sig n : parents)
                 if (n != UNIV && n.isVariable != null && realSig.isVariable == null)
                     warns.add(new ErrorWarning(realSig.isSubset, "Part of " + n.label + " is static.\n" + "Sig " + realSig.label + " is static but " + n.label + " is variable."));
@@ -2111,6 +2120,11 @@ public final class CompModule extends Browsable implements Module {
             // for (int i = 0; i < names.length; i++)
             //     names[i] = d.names.get(i).label;
             Field[] fields = s.addTrickyField(d.span(), d.isPrivate, d.disjoint, d.disjoint2, null, d.isVar, d.names, bound);
+            for (Field f : fields) {
+                if (d.getSize() >= 0) {
+                    f.setSize(d.getSize());
+                }
+            }
             final VisitQuery<Sig> q = new VisitQuery<Sig>() {
 
                 @Override
@@ -2353,6 +2367,8 @@ public final class CompModule extends Browsable implements Module {
             return ExprUnary.Op.NOOP.make(pos, UNIV);
         if (name.equals("Int"))
             return ExprUnary.Op.NOOP.make(pos, SIGINT);
+        if (name.matches("^Int/\\d+$")) 
+            return ExprUnary.Op.NOOP.make(pos, Sig.subInt(name));
         if (name.equals("seq/Int"))
             return ExprUnary.Op.NOOP.make(pos, SEQIDX);
         if (name.equals("String"))

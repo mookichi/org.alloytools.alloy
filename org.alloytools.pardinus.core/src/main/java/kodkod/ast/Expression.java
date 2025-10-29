@@ -67,20 +67,18 @@ import kodkod.util.collections.Containers;
 public abstract class Expression extends Node {
 
     /**
-     * Optional limit associated with this expression.
-     * When non-negative, it specifies the maximum allowed value (for example, the maximum number
-     * of elements, iterations, or results) used by operations that consult this field.
-     * A negative value (default -1) indicates that no limit is enforced.
+     * The size of this expression. -1 means unknown. Non-negative values are
+     * the actual sizes.
      */
-    private  int limit = -1;
+    private  int size = -1;
 	
     /**
-     * Returns the upper limit value associated with this expression.
+     * Returns the size of this expression.
      * 
-     * @return the limit value of this expression
+     * @return the size of this expression
      */
-	public int getLimit() {
-        return limit;
+	public int getSize() {
+        return size;
     }
 
     /**
@@ -88,8 +86,8 @@ public abstract class Expression extends Node {
      * 
      * @param size the maximum size to set as limit
      */
-    public void setLimit(int size) {
-        this.limit = size;
+    public void setSize(int size) {
+        this.size = size;
     }
 
     /** The universal relation:  contains all atoms in a {@link kodkod.instance.Universe universe of discourse}. */
@@ -116,7 +114,11 @@ public abstract class Expression extends Node {
      * @return this.compose(JOIN, expr)
      */
     public final Expression join(Expression expr) {
-        return compose(JOIN,expr);
+        Expression ret = compose(JOIN,expr);
+        if (expr.getSize() >= 0) {
+            ret.setSize(expr.getSize());
+        }
+        return ret;
     }
     
     /**

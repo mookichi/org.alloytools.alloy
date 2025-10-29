@@ -189,6 +189,10 @@ public final class A4SolutionReader {
                 id2sig.put(id, STRING);
                 return STRING;
             }
+            if (label.matches("^Int/\\d+$")) {
+                id2sig.put(id, Sig.subInt(label));
+                return Sig.subInt(label);
+            }
             throw new IOException("Unknown builtin sig: " + label + " (id=" + id + ")");
         }
         if (depth > nmap.size())
@@ -231,8 +235,6 @@ public final class A4SolutionReader {
                 }
             if (ans == null) {
                 ans = new SubsetSig(null, label, null, parents, isExact, isLone, isOne, isSome, isPrivate, isMeta, isVar);
-                if (node.getAttribute("msb").length() > 0)
-                ans.setMsb(Integer.parseInt(node.getAttribute("msb")));
                 allsigs.add(ans);
             }
         }

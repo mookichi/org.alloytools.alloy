@@ -257,22 +257,14 @@ final class LeafInterpreter {
 	public final BooleanMatrix interpret(Relation r) {
 		if (!lowers.containsKey(r))
 			throw new UnboundLeafException("Unbound relation: ", r);
-		int limit = uppers.get(r).size();
-		if (r.getLimit() >= 0 && r.getLimit() <= limit) {
-			limit = r.getLimit();
-		}
 		final IntSet lowerBound = lowers.get(r).indexView();
 		final IntSet upperBound = uppers.get(r).indexView();
 
-		var limitedBound = Ints.bestSet(limit);
-		for (IntIterator iter = upperBound.iterator(0, limit - 1); iter.hasNext(); ) {
-			limitedBound.add(iter.next());
-		}
-		final BooleanMatrix m = factory.matrix(Dimensions.square(universe().size(), r.arity()), limitedBound, lowerBound);
+		final BooleanMatrix m = factory.matrix(Dimensions.square(universe().size(), r.arity()), upperBound, lowerBound);
 		
-		if (limitedBound.size() > lowerBound.size()) {
+		if (upperBound.size() > lowerBound.size()) {
 			int varId = vars.get(r).min();
-			for (IntIterator indeces = limitedBound.iterator(); indeces.hasNext();) {
+			for (IntIterator indeces = upperBound.iterator(); indeces.hasNext();) {
 				int tupleIndex = indeces.next();
 				if (!lowerBound.contains(tupleIndex))  
 					m.set(tupleIndex, factory.variable(varId++));

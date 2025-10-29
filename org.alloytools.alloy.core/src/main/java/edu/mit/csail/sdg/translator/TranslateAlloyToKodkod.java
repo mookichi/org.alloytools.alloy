@@ -856,10 +856,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case SETOF :
                 return cset(x.sub);
             case NOOP :
-                Object e  = visitThis(x.sub);
-                if (e instanceof Expr && x.getMsb() >= 0)
-                    ((Expr) e).setMsb(x.sub.getMsb());
-                return e;
+                return visitThis(x.sub);
             case NOT :
                 return k2pos(cform(x.sub).not(), x);
             case AFTER :
@@ -936,7 +933,9 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     public Object visit(Field x) throws Err {
         Expression ans = a2k(x);
         if (ans == null)
-            throw new ErrorFatal(x.pos, "Field \"" + x + "\" is not bound to a legal value during translation.\n");
+        throw new ErrorFatal(x.pos, "Field \"" + x + "\" is not bound to a legal value during translation.\n");
+        if (x.getSize() >= 0)
+            ans.setSize(x.getSize());
         return ans;
     }
 
@@ -948,10 +947,10 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     @Override
     public Object visit(Sig x) throws Err {
         Expression ans = a2k(x);
-        if (x.getMsb() >= 0)
-            ans.setLimit(x.getMsb());
         if (ans == null)
-            throw new ErrorFatal(x.pos, "Sig \"" + x + "\" is not bound to a legal value during translation.\n");
+        throw new ErrorFatal(x.pos, "Sig \"" + x + "\" is not bound to a legal value during translation.\n");
+        if (x.getSize() >= 0)
+            ans.setSize(x.getSize());
         return ans;
     }
 
@@ -1233,7 +1232,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 i = cint(a);
                 return i.sha(cint(b));
             case PLUS :
-                if (a.type().is_small_int() || b.type().is_small_int()) {
+                if (a.type().arity() == 1 && a.getSize() >= 0 || b.getSize() >= 0) {
                     return cint(a).plus(cint(b));
                 } else {
                     return cset(a).union(cset(b));
@@ -1254,7 +1253,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 if (a instanceof ExprConstant && ((ExprConstant) a).op == ExprConstant.Op.NUMBER && ((ExprConstant) a).num() == 0)
                     if (b instanceof ExprConstant && ((ExprConstant) b).op == ExprConstant.Op.NUMBER && ((ExprConstant) b).num() == max + 1)
                         return IntConstant.constant(min);
-                    if (a.type().is_small_int() || b.type().is_small_int()) {
+                    if (a.type().arity() == 1 && a.getSize() >= 0 || b.getSize() >= 0) {
                         return cint(a).minus(cint(b));
                     } else {
                         return cset(a).difference(cset(b));
@@ -1267,8 +1266,6 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case IMINUS :
                 return cint(a).minus(cint(b));
             case INTERSECT :
-                if (a.type().is_small_int() ||  b.type().is_small_int()) 
-                    return cint(a).and(cint(b));
                 s = cset(a);
                 return s.intersection(cset(b));
             case ANY_ARROW_SOME :
@@ -1301,7 +1298,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 }
                 return s.join(s2);
             case EQUALS :
-                if (a.type().is_small_int() || b.type().is_small_int()) {
+                if (a.type().arity() == 1 && a.getSize() >= 0 || b.getSize() >= 0) {
                     return k2pos(cint(a).eq(cint(b)), x);
                 }
                 objL = visitThis(a);

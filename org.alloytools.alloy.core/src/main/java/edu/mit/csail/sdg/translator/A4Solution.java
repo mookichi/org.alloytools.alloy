@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.alloytools.alloy.core.AlloyCore;
 import org.alloytools.alloy.dto.InstanceDTO;
@@ -232,6 +233,8 @@ public final class A4Solution {
     /** The Kodkod Solver object. */
     private final PardinusSolver    solver;
 
+    private final Map<Expression, TupleSet> subIntMap = new HashMap<>();
+
     // ====== mutable fields (immutable after solve() has been called)
     // ===================================//
 
@@ -365,6 +368,16 @@ public final class A4Solution {
         TupleSet stringBounds = factory.noneOf(1);
         final TupleSet next = factory.noneOf(2);
         int min = min(), max = max();
+
+        Map<String, Relation> n2r = new HashMap<>();
+        IntStream.rangeClosed(min, max).forEach(i-> Sig.subInt(String.format("Int/%d", i)));
+        Sig.getSubInts().forEach((name, sig)-> {
+            Relation r = Relation.unary(name);
+            a2k.put(sig, r);
+            n2r.put(name, r);
+        });
+
+        TupleSet tset = factory.noneOf(1);
         if (max >= min)
             for (int i = min; i <= max; i++) { // Safe since we know 1 <=
                                               // bitwidth <= 30
@@ -377,11 +390,18 @@ public final class A4Solution {
                 if (i + 1 <= max)
                     next.add(factory.tuple("" + i, "" + (i + 1)));
                 if (i == min)
-                    bounds.boundExactly(KK_MIN, is);
+                bounds.boundExactly(KK_MIN, is);
                 if (i == max)
-                    bounds.boundExactly(KK_MAX, is);
-                if (i == 0)
-                    bounds.boundExactly(KK_ZERO, is);
+                bounds.boundExactly(KK_MAX, is);
+                if (i == 0) 
+                bounds.boundExactly(KK_ZERO, is);
+                tset.add(ii);
+                String name = String.format("Int/%d", i + 1);
+                if (n2r.containsKey(name)) {
+                    Relation e  = n2r.get(name);
+                    bounds.boundExactly(e, tset);
+                    subIntMap.put(e, bounds.upperBound(e));
+                }
             }
         this.sigintBounds = sigintBounds.unmodifiableView();
         this.seqidxBounds = seqidxBounds.unmodifiableView();
@@ -851,6 +871,8 @@ public final class A4Solution {
             return makeMutable ? seqidxBounds.clone() : seqidxBounds;
         if (expr == KK_STRING)
             return makeMutable ? stringBounds.clone() : stringBounds;
+        if (subIntMap.containsKey(expr))
+            return makeMutable ? subIntMap.get(expr) :subIntMap.get(expr);
         if (expr instanceof Relation) {
             if (bounds.lowerSymbBound((Relation) expr) != null)
                 return query(findUpper, findUpper ? bounds.upperSymbBound((Relation) expr) : bounds.lowerSymbBound((Relation) expr), makeMutable);
@@ -1063,9 +1085,9 @@ public final class A4Solution {
                 throw expr.errors.pick();
             Object result = TranslateAlloyToKodkod.alloy2kodkod(this, expr);
             if (result instanceof IntExpression)
-                return eval.evaluate((IntExpression) result, state) + (eval.wasOverflow() ? " (OF)" : "");
+            return eval.evaluate((IntExpression) result, state) + (eval.wasOverflow() ? " (OF)" : "");
             if (result instanceof Formula)
-                return eval.evaluate((Formula) result, state);
+            return eval.evaluate((Formula) result, state);
             if (result instanceof Expression)
                 return new A4TupleSet(eval.evaluate((Expression) result, state), this);
             throw new ErrorFatal("Unknown internal error encountered in the evaluator.");

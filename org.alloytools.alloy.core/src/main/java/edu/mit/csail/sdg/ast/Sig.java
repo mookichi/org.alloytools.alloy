@@ -17,7 +17,9 @@ package edu.mit.csail.sdg.ast;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -63,6 +65,42 @@ public abstract class Sig extends Expr implements Clause {
 
     /** The built-in "none" signature. */
     public static final PrimSig GHOST  = mkGhostSig();
+
+    /** The internal cache for sub-integer signatures. */
+    private static final Map<String, PrimSig> subInts = new HashMap<>();
+
+    /**
+     * Returns the internal cache for sub-integer signatures.
+     */
+    public static Map<String,PrimSig> getSubInts() {
+        return subInts;
+    }
+
+    /**
+     * Returns a PrimSig representing a sub-integer signature with the given name.
+     *
+     * If a signature with that name already exists in the internal cache (subInts),
+     * the cached instance is returned. Otherwise a new PrimSig is created (using
+     * Pos.UNKNOWN and SIGINT), stored in the cache, and returned.
+     *
+     * This method mutates the internal cache (subInts). Callers should provide a
+     * non-null name; behavior for null is implementation-dependent.
+     *
+     * @param name the name of the sub-integer signature
+     * @return the existing or newly created PrimSig corresponding to the given name
+     */
+    public static PrimSig subInt(String name) {
+        assert (name.matches("^Int/\\d+$"));
+        if (subInts.containsKey(name)) {
+            return subInts.get(name);
+        } else {
+            PrimSig newsig = new PrimSig(name, Pos.UNKNOWN, SIGINT, false, true);
+            subInts.put(name, newsig);
+            int size = Integer.parseInt((name + "/-1").split("/")[1]);
+            newsig.setSize(size);
+            return newsig;
+        } 
+    }
 
     private static final PrimSig mkGhostSig() {
         try {

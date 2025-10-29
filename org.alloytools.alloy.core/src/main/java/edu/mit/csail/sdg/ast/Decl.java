@@ -63,6 +63,40 @@ public final class Decl {
     /** Caches the span() result. */
     private Pos                                    span;
 
+    /**Number of elements bound by this declaration.
+     * Default = auto(-1)
+     */
+    private int size = -1;
+
+    /**
+     * Returns the number of elements bound by this declaration.
+     *
+     * <p>This corresponds to the internal {@code size} field and indicates how many
+     * names or expressions the declaration covers.
+     *
+     * @return the number of bound elements for this declaration
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
+     * Sets the stored size for this declaration.
+     *
+     * <p>Updates the internal size value used by this Decl instance. The size
+     * typically represents the number of elements or the cardinality associated
+     * with the declaration and may be used by other operations that rely on a
+     * cached or explicit size.
+     *
+     * @param size the new size to assign to this declaration; callers should
+     *             provide a non-negative integer unless negative values are
+     *             explicitly supported by the surrounding logic
+     */
+    public void setSize(int size) {
+        assert(this.size == -1);
+        this.size = size;
+    }
+
     /**
      * Returns a Pos object representing the entire span of this expression and all
      * its subexpressions.

@@ -30,26 +30,26 @@ public class ZZDebug{
         Command cmd = commands.get(0);
         A4Options opt = new A4Options();
         // opt.solver = new KKTransformer();
-        // opt.solver = kodkod.solvers.SAT4JRef.INSTANCE;
-        opt.solver = kodkod.solvers.PMaxSAT4JRef.INSTANCE;
+        opt.solver = kodkod.solvers.SAT4JRef.INSTANCE;
+        // opt.solver = kodkod.solvers.PMaxSAT4JRef.INSTANCE;
         // opt.decompose_mode = 1;
         // opt.solver = kodkod.engine.satlab.SATFactory.get("sat4j.pmax");
         // opt.solver = kodkod.engine.satlab.SATFactory.get("WCNF output");
         // opt.solver = kodkod.engine.satlab.SATFactory.get("maxsat.external");
         opt.noOverflow = false;
-        opt.symmetry = 100;
+        opt.symmetry = 20;
         // solve
         A4Solution sol = TranslateAlloyToKodkod.execute_command(rep, world.getAllSigs(), cmd, opt);
-        sol = sol.next();
-        sol = sol.next();
-        sol = sol.next();
+        // sol = sol.next();
+        // sol = sol.next();
+        // sol = sol.next();
 
         sol.writeXML(null, "_Debug2.xml", world.getAllFunc(), null);
         // sol = null;
 
         // A4Solution sol = null;
 
-        new VizGUI(false, "_Debug2.xml", null, null, null, 1);//.loadThemeFile("thm.thm");
+        new VizGUI(false, "_Debug2.xml", null, null, null, 1).doShowTable();//.loadThemeFile("thm.thm");
 
         // var x = 3;
 
@@ -75,7 +75,8 @@ public class ZZDebug{
     public static void main(String[] args) throws Err {
         A4Reporter rep = new A4Reporter();
 
-        String model = "sig X in Int/3{}\nrun {#X >= 2} for 8 int";
+        // String model = "sig Y {} \n sig X extends Int/2 {}\n run {}";
+        String model = "one sig X {n : set Int/5} \nsig  Y in Int/3 {}\nrun {X.n  + #X.n = 7} for 8 int";
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

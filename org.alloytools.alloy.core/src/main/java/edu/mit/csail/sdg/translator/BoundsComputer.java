@@ -446,6 +446,9 @@ final class BoundsComputer {
                     ub.addAll(upper);
                 }
                 Relation r = sol.addRel(s.label + "." + f.label, null, ub, f.isVariable != null);
+                if (f.getSize() >= 0) {
+                    r.setSize(f.getSize());
+                }
                 // [electrum] avoid collapse of mutable singleton sigs
                 sol.addField(f, isOne && !isVar ? sol.a2k(s).product(r) : r);
             }

@@ -274,11 +274,11 @@ public final class ExprUnary extends Expr {
                 // to clutter the output window with an extra useless report of
                 // "Multiplicity expression not allowed here!"
             }
-            int msb = -1;
+            int size = -1;
             extraError = null;
             switch (this) {
                 case NOOP :
-                    msb = sub.getMsb();
+                    size = sub.getSize();
                     break;
                 case NOT :
                 case AFTER :
@@ -362,11 +362,11 @@ public final class ExprUnary extends Expr {
                         type = SIGINT.type;
                         break;
                 }
-            if (msb >= 0 && type.is_int())
+            if (size >= 0 && type.is_int())
                 type = Type.smallIntType();
             ExprUnary e =new ExprUnary(pos, this, sub, type, extraWeight + sub.weight, errors.make(extraError));
-            if (msb >= 0)
-                e.setMsb(msb);
+            if (size >= 0)
+                e.setSize(size);
             return e;
         }
 

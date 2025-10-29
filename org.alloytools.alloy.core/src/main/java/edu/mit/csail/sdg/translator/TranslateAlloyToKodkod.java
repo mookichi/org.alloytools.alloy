@@ -689,9 +689,9 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     private IntExpression toInt(Expr x, Object y) throws Err, ErrorFatal {
         // simplify: if y is int[Int[sth]] then return sth
         if (y instanceof ExprToIntCast) {
-            ExprToIntCast y2 = (ExprToIntCast) y;
-            if (y2.expression() instanceof IntToExprCast)
-                return ((IntToExprCast) y2.expression()).intExpr();
+            if (x instanceof ExprConstant)
+                return (IntExpression) visit((ExprConstant) x);
+            return (IntExpression) y;
         }
         // simplify: if y is Int[sth], then return sth
         if (y instanceof IntToExprCast)
@@ -699,7 +699,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
         if (y instanceof IntExpression)
             return (IntExpression) y;
         // [AM]: maybe this conversion should be removed
-        if (y instanceof Expression)
+        if (y instanceof Expression) 
             return ((Expression) y).sum();
         throw new ErrorFatal(x.span(), "This should have been an integer expression.\nInstead it is " + y);
     }
@@ -836,7 +836,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 // if (n>max) throw new ErrorType(x.pos, "Current bitwidth is
                 // set to "+bitwidth+", thus this integer constant "+n+" is
                 // bigger than the maximum integer "+max);
-                return IntConstant.constant(n).toExpression();
+                return IntConstant.constant(n);
         }
         throw new ErrorFatal(x.pos, "Unsupported operator (" + x.op + ") encountered during ExprConstant.accept()");
     }
@@ -886,7 +886,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case CARDINALITY :
                 return cset(x.sub).count();
             case CAST2SIGINT :
-                return cint(x.sub).toExpression();
+                return cint(x.sub).toBitset();
             case CAST2INT :
                 return sum(cset(x.sub));
             case RCLOSURE :
@@ -1228,7 +1228,11 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 i = cint(a);
                 return i.sha(cint(b));
             case PLUS :
-                return cset(a).union(cset(b));
+                if (a.type().is_small_int() || b.type().is_small_int()) {
+                    return cint(a).plus(cint(b));
+                } else {
+                    return cset(a).union(cset(b));
+                }
             // [AM]
             // obj = visitThis(a);
             // if (obj instanceof IntExpression) { i=(IntExpression)obj; return
@@ -1245,7 +1249,11 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 if (a instanceof ExprConstant && ((ExprConstant) a).op == ExprConstant.Op.NUMBER && ((ExprConstant) a).num() == 0)
                     if (b instanceof ExprConstant && ((ExprConstant) b).op == ExprConstant.Op.NUMBER && ((ExprConstant) b).num() == max + 1)
                         return IntConstant.constant(min);
-                return cset(a).difference(cset(b));
+                    if (a.type().is_small_int() || b.type().is_small_int()) {
+                        return cint(a).minus(cint(b));
+                    } else {
+                        return cset(a).difference(cset(b));
+                    }
             // [AM]
             // obj=visitThis(a);
             // if (obj instanceof IntExpression) { i=(IntExpression)obj; return
@@ -1254,6 +1262,8 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case IMINUS :
                 return cint(a).minus(cint(b));
             case INTERSECT :
+                if (a.type().is_small_int() ||  b.type().is_small_int()) 
+                    return cint(a).and(cint(b));
                 s = cset(a);
                 return s.intersection(cset(b));
             case ANY_ARROW_SOME :
@@ -1286,6 +1296,9 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 }
                 return s.join(s2);
             case EQUALS :
+                if (a.type().is_small_int() || b.type().is_small_int()) {
+                    return k2pos(cint(a).eq(cint(b)), x);
+                }
                 objL = visitThis(a);
                 objR = visitThis(b);
                 eL = toSet(a, objL);

@@ -825,9 +825,9 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 			final int msb = twosComplement.size()-1;
 			// handle all bits but the sign bit
 			for(int i = 0; i < msb; i++) { 
-				int pow2 = 1<<i;
-				if (ints.contains(pow2)) { 
-					ret.set(interpreter.interpret(pow2), twosComplement.get(i));
+				// map bitvector
+				if (ints.contains(i)) { 
+					ret.set(interpreter.interpret(i), twosComplement.get(i));
 				}
 			}
 			// handle the sign bit
@@ -883,7 +883,8 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 			return interpreter.factory().integer(0);
 		else if (low==high) {
 			int i = iter.next();
-			return interpreter.factory().integer(i, m.get(interpreter.interpret(i)));
+			int j = iter.hasNext() ? 1<< i : -1<< i;
+			return interpreter.factory().integer(j, m.get(interpreter.interpret(i)));
 		} else {
 			final int mid = (low + high) / 2;
 			final Int lsum = sum(m, iter, low, mid);

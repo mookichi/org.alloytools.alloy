@@ -1044,10 +1044,12 @@ UnionDiffExprB ::= UnionDiffExprB:a INTSUB:o MulExprB:b    {: RESULT=ExprBinary.
 
 MulExprA ::=                         NumUnopExprA:b        {: RESULT=b;                                            :};
 MulExprA ::= MulExprB:a INTMUL:o     Bind:b                {: RESULT=ExprBinary.Op.MUL       .make(o, null, a, b); :};
+MulExprA ::= MulExprB:a STAR:o     Bind:b                {: RESULT=ExprBinary.Op.MUL       .make(o, null, a, b); :};
 MulExprA ::= MulExprB:a INTDIV:o     Bind:b                {: RESULT=ExprBinary.Op.DIV       .make(o, null, a, b); :};
 MulExprA ::= MulExprB:a INTREM:o     Bind:b                {: RESULT=ExprBinary.Op.REM       .make(o, null, a, b); :};
 MulExprB ::=                         NumUnopExprB:b        {: RESULT=b;                                            :};
 MulExprB ::= MulExprB:a INTMUL:o     NumUnopExprB:b        {: RESULT=ExprBinary.Op.MUL       .make(o, null, a, b); :};
+MulExprB ::= MulExprB:a STAR:o     NumUnopExprB:b        {: RESULT=ExprBinary.Op.MUL       .make(o, null, a, b); :};
 MulExprB ::= MulExprB:a INTDIV:o     NumUnopExprB:b        {: RESULT=ExprBinary.Op.DIV       .make(o, null, a, b); :};
 MulExprB ::= MulExprB:a INTREM:o     NumUnopExprB:b        {: RESULT=ExprBinary.Op.REM       .make(o, null, a, b); :};
 

@@ -232,6 +232,8 @@ import java_cup.runtime.*;
 "'"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
 "‘"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
 "’"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
+"%"                   { return alloy_sym(yytext(), CompSym.INTDIV       );}
+"%rem"                   { return alloy_sym(yytext(), CompSym.INTREM       );}
 
 [\"] ([^\\\"] | ("\\" .))* [\"] [\$0-9a-zA-Z_\"] [\$0-9a-zA-Z_\"]* 	   { throw new ErrorSyntax(alloy_here(yytext()),"String literal cannot be followed by a legal identifier character."); }
 [\"] ([^\\\"] | ("\\" .))* [\"]                                        { return alloy_string(yytext()); }

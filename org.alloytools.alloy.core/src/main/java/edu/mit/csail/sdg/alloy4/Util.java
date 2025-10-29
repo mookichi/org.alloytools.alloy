@@ -840,7 +840,7 @@ public final class Util {
      * (bitwidth < 1).
      */
     public static int max(int bitwidth) {
-        return bitwidth < 1 ? -1 : (1 << (bitwidth - 1)) - 1;
+        return bitwidth < 1 ? -1 : bitwidth - 1;
     }
 
     /**
@@ -848,7 +848,7 @@ public final class Util {
      * (bitwidth < 1)
      */
     public static int min(int bitwidth) {
-        return bitwidth < 1 ? 0 : 0 - (1 << (bitwidth - 1));
+        return 0;
     }
 
     /**

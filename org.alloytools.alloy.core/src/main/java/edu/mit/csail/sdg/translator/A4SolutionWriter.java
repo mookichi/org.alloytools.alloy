@@ -188,6 +188,8 @@ public final class A4SolutionWriter {
             out.print("\" enum=\"yes");
         if (x.isVariable != null)
             out.print("\" var=\"yes");
+        if (x.getMsb() >= 0)
+            out.print(String.format("\" msb=\"%d", x.getMsb()));
         out.print("\">\n");
         try {
             if (sol != null && x != Sig.UNIV && x != Sig.SIGINT && x != Sig.SEQIDX) {

@@ -231,6 +231,8 @@ public final class A4SolutionReader {
                 }
             if (ans == null) {
                 ans = new SubsetSig(null, label, null, parents, isExact, isLone, isOne, isSome, isPrivate, isMeta, isVar);
+                if (node.getAttribute("msb").length() > 0)
+                ans.setMsb(Integer.parseInt(node.getAttribute("msb")));
                 allsigs.add(ans);
             }
         }

@@ -21,3 +21,4 @@ enroute.zip
 .idea
 *.iml
 languageServers-log/AlloyLanguageServer.log
+_Debug2.xml

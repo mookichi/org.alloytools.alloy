@@ -65,8 +65,34 @@ import kodkod.util.collections.Containers;
  * @modified Eduardo Pessoa, Nuno Macedo // [HASLab] temporal model finding
  */
 public abstract class Expression extends Node {
+
+    /**
+     * Optional limit associated with this expression.
+     * When non-negative, it specifies the maximum allowed value (for example, the maximum number
+     * of elements, iterations, or results) used by operations that consult this field.
+     * A negative value (default -1) indicates that no limit is enforced.
+     */
+    private  int limit = -1;
 	
-	/** The universal relation:  contains all atoms in a {@link kodkod.instance.Universe universe of discourse}. */
+    /**
+     * Returns the upper limit value associated with this expression.
+     * 
+     * @return the limit value of this expression
+     */
+	public int getLimit() {
+        return limit;
+    }
+
+    /**
+     * Sets the limit for this expression.
+     * 
+     * @param size the maximum size to set as limit
+     */
+    public void setLimit(int size) {
+        this.limit = size;
+    }
+
+    /** The universal relation:  contains all atoms in a {@link kodkod.instance.Universe universe of discourse}. */
 	public static final Expression UNIV = new ConstantExpression("univ", 1);
 	
 	/** The identity relation: maps all atoms in a {@link kodkod.instance.Universe universe of discourse} to themselves. */

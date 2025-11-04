@@ -16,3 +16,15 @@ plugins {
   id 'org.gradle.toolchains.foojay-resolver-convention' version '0.9.0'
   id 'biz.aQute.bnd.workspace'
 }
+
+
+include 'org.alloytools.alloy.application', 
+'org.alloytools.alloy.cli', 
+  'org.alloytools.alloy.core',
+  'org.alloytools.alloy.dist',
+  'org.alloytools.alloy.extra',
+  'org.alloytools.alloy.lsp',
+  'org.alloytools.alloy.wrappers',
+  'org.alloytools.api',
+  'org.alloytools.pardinus.core',
+  'org.alloytools.pardinus.native'

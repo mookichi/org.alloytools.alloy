@@ -1217,6 +1217,8 @@ public final class CompModule extends Browsable implements Module {
             return UNIV;
         if (name.equals("Int"))
             return SIGINT;
+        if (name.matches("Int/\\d+"))
+            return SIGINT;
         if (name.equals("seq/Int"))
             return SEQIDX;
         if (name.equals("String"))
@@ -1514,9 +1516,14 @@ public final class CompModule extends Browsable implements Module {
             List<Sig> newParents = new ArrayList<Sig>(parents == null ? 0 : parents.size());
             if (parents == null)
                 parents = Arrays.asList();
-            for (ExprVar p : parents)
+            int msb = -1;
+            for (ExprVar p : parents) {
                 newParents.add(new PrimSig(p.label, WHERE.make(p.pos)));
+                if (msb < p.getMsb())
+                    msb = p.getMsb();
+            }
             obj = new SubsetSig(namePos, full, parents.stream().map(p -> p.pos).collect(Collectors.toList()), newParents, attributes);
+            obj.setMsb(msb);
         } else {
             attributes = Util.append(attributes, SUBSIG.makenull(subsig));
             PrimSig newParent = (parents != null && parents.size() > 0) ? (new PrimSig(parents.get(0).label, WHERE.make(parents.get(0).pos))) : UNIV;
@@ -1573,6 +1580,8 @@ public final class CompModule extends Browsable implements Module {
                 parents.add(resolveSig(res, topo, parentAST, warns));
             }
             realSig = new SubsetSig(oldSS.pos, fullname, oldSS.parentRefPoss, parents, oldS.attributes.toArray(new Attr[0]));
+            if (oldS.getMsb() >= 0)
+                realSig.setMsb(oldS.getMsb());
             for (Sig n : parents)
                 if (n != UNIV && n.isVariable != null && realSig.isVariable == null)
                     warns.add(new ErrorWarning(realSig.isSubset, "Part of " + n.label + " is static.\n" + "Sig " + realSig.label + " is static but " + n.label + " is variable."));

@@ -856,7 +856,10 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case SETOF :
                 return cset(x.sub);
             case NOOP :
-                return visitThis(x.sub);
+                Object e  = visitThis(x.sub);
+                if (e instanceof Expr && x.getMsb() >= 0)
+                    ((Expr) e).setMsb(x.sub.getMsb());
+                return e;
             case NOT :
                 return k2pos(cform(x.sub).not(), x);
             case AFTER :
@@ -945,6 +948,8 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     @Override
     public Object visit(Sig x) throws Err {
         Expression ans = a2k(x);
+        if (x.getMsb() >= 0)
+            ans.setLimit(x.getMsb());
         if (ans == null)
             throw new ErrorFatal(x.pos, "Sig \"" + x + "\" is not bound to a legal value during translation.\n");
         return ans;

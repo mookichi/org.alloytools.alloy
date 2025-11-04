@@ -102,6 +102,30 @@ public abstract class Expr extends Browsable {
 
     private Clause                 referenced;
 
+    /**
+     * The most significant bit (msb) value associated with this variable.
+     * Initialized to -1 to indicate that it has not been set.
+     */
+    private int msb = -1;
+
+    /**
+     * Returns the most significant bit (MSB) value associated with this variable.
+     *
+     * @return the MSB value as an integer
+     */
+    public int getMsb() {
+        return msb;
+    }
+
+    /**
+     * Sets the most significant bit (msb) value for this variable expression.
+     *
+     * @param msb the value to set as the most significant bit
+     */
+    public void setMsb(int msb) {
+        this.msb = msb;
+    }
+
     /** This is an unmodifiable empty list of Err objects. */
     static final JoinableList<Err> emptyListOfErrors = new JoinableList<Err>();
 

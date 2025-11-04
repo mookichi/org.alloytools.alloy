@@ -6,13 +6,16 @@
 	org.alloytools.alloy.core;version=latest,\
 	aQute.libg,\
 	org.alloytools.api,\
-	org.alloytools.pardinus.core
+	org.alloytools.pardinus.core,\
+    org.sat4j.core, \
+    org.sat4j.maxsat, \
+    org.sat4j.pb
+	
 -testpath: \
 	biz.aQute.wrapper.junit, \
-	biz.aQute.wrapper.hamcrest, \
-    org.sat4j.core, \
+	biz.aQute.wrapper.hamcrest
 
 Private-Package: \
 	edu.mit.csail.sdg.alloy4graph,\
 	edu.mit.csail.sdg.alloy4viz,\
-	edu.mit.csail.sdg.alloy4whole,\
+	edu.mit.csail.sdg.alloy4whole

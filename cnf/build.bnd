@@ -5,14 +5,14 @@
 src:          			src/main/java
 bin:          			target/classes
 testsrc:      			src/test/java
-testbin:      			target/test-classes
+testbin:      			target/classes
 target-dir:   			target
 
 javac.source:           17
-javac.target:           17
-javac.compliance:       17
+javac.target:           25
+javac.compliance:       25
 javac.debug:            on
--sources                false
+-sources                true
 
 Git-Descriptor:         	${system-allow-fail;git describe --dirty --always}
 Git-SHA:                	${system-allow-fail;git rev-list -1 HEAD}

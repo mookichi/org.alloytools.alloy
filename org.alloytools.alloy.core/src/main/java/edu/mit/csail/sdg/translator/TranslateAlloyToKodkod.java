@@ -934,8 +934,8 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
         Expression ans = a2k(x);
         if (ans == null)
         throw new ErrorFatal(x.pos, "Field \"" + x + "\" is not bound to a legal value during translation.\n");
-        if (x.getSize() >= 0)
-            ans.setSize(x.getSize());
+        if (x.getBitwidth() >= 0)
+            ans.setBitwidth(x.getBitwidth());
         return ans;
     }
 
@@ -949,8 +949,8 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
         Expression ans = a2k(x);
         if (ans == null)
         throw new ErrorFatal(x.pos, "Sig \"" + x + "\" is not bound to a legal value during translation.\n");
-        if (x.getSize() >= 0)
-            ans.setSize(x.getSize());
+        if (x.getBitwidth() >= 0)
+            ans.setBitwidth(x.getBitwidth());
         return ans;
     }
 
@@ -1232,7 +1232,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 i = cint(a);
                 return i.sha(cint(b));
             case PLUS :
-                if (a.type().arity() == 1 && a.getSize() >= 0 || b.getSize() >= 0) {
+                if (a.type().arity() == 1 && a.getBitwidth() >= 0 || b.getBitwidth() >= 0) {
                     return cint(a).plus(cint(b));
                 } else {
                     return cset(a).union(cset(b));
@@ -1253,7 +1253,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 if (a instanceof ExprConstant && ((ExprConstant) a).op == ExprConstant.Op.NUMBER && ((ExprConstant) a).num() == 0)
                     if (b instanceof ExprConstant && ((ExprConstant) b).op == ExprConstant.Op.NUMBER && ((ExprConstant) b).num() == max + 1)
                         return IntConstant.constant(min);
-                    if (a.type().arity() == 1 && a.getSize() >= 0 || b.getSize() >= 0) {
+                    if (a.type().arity() == 1 && a.getBitwidth() >= 0 || b.getBitwidth() >= 0) {
                         return cint(a).minus(cint(b));
                     } else {
                         return cset(a).difference(cset(b));
@@ -1298,7 +1298,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 }
                 return s.join(s2);
             case EQUALS :
-                if (a.type().arity() == 1 && a.getSize() >= 0 || b.getSize() >= 0) {
+                if (a.type().arity() == 1 && a.getBitwidth() >= 0 || b.getBitwidth() >= 0) {
                     return k2pos(cint(a).eq(cint(b)), x);
                 }
                 objL = visitThis(a);

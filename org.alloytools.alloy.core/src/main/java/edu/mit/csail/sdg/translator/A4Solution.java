@@ -370,7 +370,7 @@ public final class A4Solution {
         int min = min(), max = max();
 
         Map<String, Relation> n2r = new HashMap<>();
-        IntStream.rangeClosed(min, max).forEach(i-> Sig.subInt(String.format("Int/%d", i)));
+        IntStream.rangeClosed(min, max).forEach(i-> Sig.subInt(String.format("Int/%d", i + 1)));
         Sig.getSubInts().forEach((name, sig)-> {
             Relation r = Relation.unary(name);
             a2k.put(sig, r);

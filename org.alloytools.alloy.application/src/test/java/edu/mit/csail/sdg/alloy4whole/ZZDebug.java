@@ -76,7 +76,7 @@ public class ZZDebug{
         A4Reporter rep = new A4Reporter();
 
         // String model = "sig Y {} \n sig X extends Int/2 {}\n run {}";
-        String model = "one sig X {n : set Int/5} \nsig  Y in Int/3 {}\nrun {X.n  + #X.n = 7} for 8 int";
+        String model = "one sig X {n : some Int/5} \nsome sig  Y in Int/3 {}\nrun {X.n  + #X.n = 7} for 8 int";
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

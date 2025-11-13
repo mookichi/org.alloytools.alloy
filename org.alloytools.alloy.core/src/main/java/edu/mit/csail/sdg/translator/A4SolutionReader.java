@@ -235,6 +235,8 @@ public final class A4SolutionReader {
                 }
             if (ans == null) {
                 ans = new SubsetSig(null, label, null, parents, isExact, isLone, isOne, isSome, isPrivate, isMeta, isVar);
+                if (node.getAttribute("size").length() > 0)
+                ans.setBitwidth(Integer.parseInt(node.getAttribute("size")));
                 allsigs.add(ans);
             }
         }
@@ -314,6 +316,8 @@ public final class A4SolutionReader {
             , UNIV.join(type))[0];
         }
         TupleSet ts = parseTuples(node, arity);
+        if (node.getAttribute("size").length() > 0)
+            field.setBitwidth(Integer.parseInt(node.getAttribute("size")));
         expr2ts.put(field, ts);
         return field;
     }

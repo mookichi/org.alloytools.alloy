@@ -66,7 +66,7 @@ public final class Decl {
     /**Number of elements bound by this declaration.
      * Default = auto(-1)
      */
-    private int size = -1;
+    private int bitwidth = -1;
 
     /**
      * Returns the number of elements bound by this declaration.
@@ -74,10 +74,10 @@ public final class Decl {
      * <p>This corresponds to the internal {@code size} field and indicates how many
      * names or expressions the declaration covers.
      *
-     * @return the number of bound elements for this declaration
+     * @return the bitwidth of this declaration
      */
-    public int getSize() {
-        return size;
+    public int getBitwidth() {
+        return bitwidth;
     }
 
     /**
@@ -92,9 +92,9 @@ public final class Decl {
      *             provide a non-negative integer unless negative values are
      *             explicitly supported by the surrounding logic
      */
-    public void setSize(int size) {
-        assert(this.size == -1);
-        this.size = size;
+    public void setBitwidth(int bitwidth) {
+        assert(this.bitwidth == -1);
+        this.bitwidth = bitwidth;
     }
 
     /**

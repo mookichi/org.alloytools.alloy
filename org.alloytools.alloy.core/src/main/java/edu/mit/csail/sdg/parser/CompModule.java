@@ -1516,16 +1516,16 @@ public final class CompModule extends Browsable implements Module {
             List<Sig> newParents = new ArrayList<Sig>(parents == null ? 0 : parents.size());
             if (parents == null)
                 parents = Arrays.asList();
-            int size = -1;
+            int bitwidth = -1;
             for (ExprVar p : parents) {
                 newParents.add(new PrimSig(p.label, WHERE.make(p.pos)));
-                if (size < p.getSize()){
-                    size = p.getSize();
+                if (bitwidth < p.getBitwidth()){
+                    bitwidth = p.getBitwidth();
                 }
             }
             obj = new SubsetSig(namePos, full, parents.stream().map(p -> p.pos).collect(Collectors.toList()), newParents, attributes);
-            if (size >= 0) {
-                obj.setSize(size);
+            if (bitwidth >= 0) {
+                obj.setBitwidth(bitwidth);
             }
         } else {
             attributes = Util.append(attributes, SUBSIG.makenull(subsig));
@@ -1535,8 +1535,8 @@ public final class CompModule extends Browsable implements Module {
         }
         sigs.put(name, obj);
         for (Decl f : fields) {
-            if (f.expr instanceof ExprUnary && ((ExprUnary) f.expr).sub.getSize() >= 0) {
-                f.setSize(((ExprUnary) f.expr).sub.getSize());
+            if (f.expr instanceof ExprUnary && ((ExprUnary) f.expr).sub.getBitwidth() >= 0) {
+                f.setBitwidth(((ExprUnary) f.expr).sub.getBitwidth());
             }
         }
         old2fields.put(obj, fields);
@@ -1588,8 +1588,8 @@ public final class CompModule extends Browsable implements Module {
                 parents.add(resolveSig(res, topo, parentAST, warns));
             }
             realSig = new SubsetSig(oldSS.pos, fullname, oldSS.parentRefPoss, parents, oldS.attributes.toArray(new Attr[0]));
-            if (oldS.getSize() >= 0) {
-                realSig.setSize(oldS.getSize());
+            if (oldS.getBitwidth() >= 0) {
+                realSig.setBitwidth(oldS.getBitwidth());
             }
             for (Sig n : parents)
                 if (n != UNIV && n.isVariable != null && realSig.isVariable == null)
@@ -2121,8 +2121,8 @@ public final class CompModule extends Browsable implements Module {
             //     names[i] = d.names.get(i).label;
             Field[] fields = s.addTrickyField(d.span(), d.isPrivate, d.disjoint, d.disjoint2, null, d.isVar, d.names, bound);
             for (Field f : fields) {
-                if (d.getSize() >= 0) {
-                    f.setSize(d.getSize());
+                if (d.getBitwidth() >= 0) {
+                    f.setBitwidth(d.getBitwidth());
                 }
             }
             final VisitQuery<Sig> q = new VisitQuery<Sig>() {

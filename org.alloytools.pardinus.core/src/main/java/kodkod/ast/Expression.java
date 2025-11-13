@@ -67,27 +67,27 @@ import kodkod.util.collections.Containers;
 public abstract class Expression extends Node {
 
     /**
-     * The size of this expression. -1 means unknown. Non-negative values are
-     * the actual sizes.
+     * The bitwidth of this expression. -1 means unknown. Non-negative values are
+     * the actual bitwidths.
      */
-    private  int size = -1;
+    private  int bitwidth = -1;
 	
     /**
-     * Returns the size of this expression.
+     * Returns the bitwidth of this expression.
      * 
-     * @return the size of this expression
+     * @return the bitwidth of this expression
      */
-	public int getSize() {
-        return size;
+	public int getBitwidth() {
+        return bitwidth;
     }
 
     /**
-     * Sets the limit for this expression.
+     * Sets the bitwidth for this expression.
      * 
-     * @param size the maximum size to set as limit
+     * @param bitwidth the maximum bitwidth to set as the bitwidth of this expression
      */
-    public void setSize(int size) {
-        this.size = size;
+    public void setBitwidth(int bitwidth) {
+        this.bitwidth = bitwidth;
     }
 
     /** The universal relation:  contains all atoms in a {@link kodkod.instance.Universe universe of discourse}. */
@@ -115,8 +115,8 @@ public abstract class Expression extends Node {
      */
     public final Expression join(Expression expr) {
         Expression ret = compose(JOIN,expr);
-        if (expr.getSize() >= 0) {
-            ret.setSize(expr.getSize());
+        if (expr.getBitwidth() >= 0) {
+            ret.setBitwidth(expr.getBitwidth());
         }
         return ret;
     }

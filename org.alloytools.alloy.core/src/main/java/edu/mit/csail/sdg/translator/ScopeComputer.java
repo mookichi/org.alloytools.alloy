@@ -136,7 +136,7 @@ final class ScopeComputer {
         if (sig == SIGINT)
             return bitwidth;
         if (Sig.getSubInts().containsValue(sig))
-            return sig.getSize();
+            return sig.getBitwidth();
         if (sig == SEQIDX)
         return maxseq;
         if (sig == STRING)

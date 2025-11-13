@@ -97,7 +97,7 @@ public abstract class Sig extends Expr implements Clause {
             PrimSig newsig = new PrimSig(name, Pos.UNKNOWN, SIGINT, false, true);
             subInts.put(name, newsig);
             int size = Integer.parseInt((name + "/-1").split("/")[1]);
-            newsig.setSize(size);
+            newsig.setBitwidth(size);
             return newsig;
         } 
     }

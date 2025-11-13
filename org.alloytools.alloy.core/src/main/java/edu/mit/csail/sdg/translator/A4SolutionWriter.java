@@ -188,6 +188,8 @@ public final class A4SolutionWriter {
             out.print("\" enum=\"yes");
         if (x.isVariable != null)
             out.print("\" var=\"yes");
+        if (x.getBitwidth() >= 0)
+            out.print(String.format("\" size=\"%d", x.getBitwidth()));
         out.print("\">\n");
         try {
             if (sol != null && x != Sig.UNIV && x != Sig.SIGINT && x != Sig.SEQIDX && !Sig.getSubInts().containsValue(x)) {
@@ -225,6 +227,8 @@ public final class A4SolutionWriter {
                 out.print("\" meta=\"yes");
             if (x.isVariable != null)
                 out.print("\" var=\"yes");
+            if (x.getBitwidth() >= 0)
+                out.print(String.format("\" size=\"%d", x.getBitwidth()));
             out.print("\">\n");
             writeExpr("", x, state);
             out.print("</field>\n");

@@ -103,26 +103,26 @@ public abstract class Expr extends Browsable {
     private Clause                 referenced;
 
     /**
-     * The Size of this expression. -1 means unknown. Non-negative values are
-     * the actual sizes.
+     * The bitwidth of this expression. -1 means unknown. Non-negative values are
+     * the actual bitwidths.
      */
-    private int size = -1;
+    private int bitwidth = -1;
 
     /**
-     * Returns the number of elements bound by this expression.
-     * @return  the number of bound elements for this expression
+     * Returns the bitwidth of this expression.
+     * @return  the bitwidth of this expression
      */
-    public int getSize() {
-        return size;
+    public int getBitwidth() {
+        return bitwidth;
     }
 
     /**
-     * Sets the number of elements bound by this expression.
-     * @param size
+     * Sets the bitwidth of this expression.
+     * @param bitwidth
      */
-    public void setSize(int size) {
-        assert(this.size == -1);
-        this.size = size;
+    public void setBitwidth(int bitwidth) {
+        assert(this.bitwidth == -1);
+        this.bitwidth = bitwidth;
     }
 
     /** This is an unmodifiable empty list of Err objects. */

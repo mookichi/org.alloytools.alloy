@@ -642,6 +642,13 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		BooleanValue ret = lookup(quantFormula);
 		if (ret!=null) return ret;
 
+		if (quantFormula.getPriority() != 0L) {
+			final BooleanAccumulator or = BooleanAccumulator.treeGate(Operator.NOP);
+			some(quantFormula.decls(), quantFormula.formula(), 0, BooleanConstant.TRUE, or); 
+			ret = interpreter.factory().accumulate(or);
+			ret.setPriority(quantFormula.getPriority());
+			return cache(quantFormula,ret);
+		}
 		final Quantifier quantifier = quantFormula.quantifier();
 		switch(quantifier) {
 		case ALL		: 
@@ -752,11 +759,18 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		final BooleanMatrix right = compFormula.right().accept(this);
 		final ExprCompOperator op = compFormula.op();
 
+		if (compFormula.left().getPriority() != 0L) {
+			// if compFormula.lert has maxsat priority
+			ret = left.nop(env);
+			ret.setPriority(compFormula.left().getPriority());
+			ret = interpreter.factory().and(ret,  left.subset(right, env));
+			return cache(compFormula,ret);
+		}
 		switch(op) {
 		case SUBSET	: ret = left.subset(right, env); break;
 		case EQUALS	: ret = left.eq(right, env); break;
 		default : 
-			throw new IllegalArgumentException("Unknown operator: " + compFormula.op());
+				throw new IllegalArgumentException("Unknown operator: " + compFormula.op());
 		}
 		return cache(compFormula,ret);
 	}
@@ -775,7 +789,12 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 
 		final BooleanMatrix child = multFormula.expression().accept(this);
 		final Multiplicity mult = multFormula.multiplicity();
-
+		
+		if (multFormula.getPriority() != 0L) { // if multFormula has maxsat priority
+			ret = child.nop(env);
+			ret.setPriority(multFormula.getPriority());
+			return cache(multFormula, ret);
+		}
 		switch(mult) {
 		case NO 	: ret = child.none(env); break;
 		case SOME	: ret = child.some(env); break;
@@ -784,7 +803,7 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		default : 
 			throw new IllegalArgumentException("Unknown multiplicity: " + mult);
 		}
-
+		
 		return cache(multFormula, ret);
 	}
 

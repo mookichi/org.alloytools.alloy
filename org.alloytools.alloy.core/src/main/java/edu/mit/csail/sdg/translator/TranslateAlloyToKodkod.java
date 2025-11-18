@@ -66,6 +66,7 @@ import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
 import kodkod.ast.IntExpression;
 import kodkod.ast.IntToExprCast;
+import kodkod.ast.Node;
 import kodkod.ast.QuantifiedFormula;
 import kodkod.ast.Relation;
 import kodkod.ast.Variable;
@@ -856,6 +857,11 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case SETOF :
                 return cset(x.sub);
             case NOOP :
+                if (x.sub.getPriority() != 0) {
+                    final Node ret = (Node) visitThis(x.sub);
+                    ret.setPriority(x.sub.getPriority()); // propagate sub-expression's maxsat priority
+                    return ret;
+                }
                 return visitThis(x.sub);
             case NOT :
                 return k2pos(cform(x.sub).not(), x);
@@ -872,6 +878,11 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case ONCE :
                 return k2pos(cform(x.sub).once(), x);
             case SOME :
+                if (x.getPriority() != 0) {
+                    Formula ret =  k2pos(cset(x.sub).some(), x);
+                    ret.setPriority(x.getPriority()); //propagate maxsat priority
+                    return ret;
+                }
                 return k2pos(cset(x.sub).some(), x);
             case LONE :
                 return k2pos(cset(x.sub).lone(), x);
@@ -895,7 +906,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case CLOSURE :
                 return cset(x.sub).closure();
         }
-        throw new ErrorFatal(x.pos, "Unsupported operator (" + x.op + ") encountered during ExprUnary.visit()");
+                throw new ErrorFatal(x.pos, "Unsupported operator (" + x.op + ") encountered during ExprUnary.visit()");
     }
 
     /**
@@ -1526,7 +1537,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     /**
      * Helper method that translates the quantification expression "op vars | sub"
      */
-    private Object visit_qt(final ExprQt.Op op, final ConstList<Decl> xvars, final Expr sub) throws Err {
+    private Node visit_qt(final ExprQt.Op op, final ConstList<Decl> xvars, final Expr sub) throws Err {
         if (op == ExprQt.Op.NO) {
             return visit_qt(ExprQt.Op.ALL, xvars, sub.not());
         }
@@ -1630,9 +1641,10 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             x = (ExprQt) xx;
         else
             return visitThis(xx);
-        Object ans = visit_qt(x.op, x.decls, x.sub);
+        Node ans = visit_qt(x.op, x.decls, x.sub);
         if (ans instanceof Formula)
             k2pos((Formula) ans, x);
+        ans.setPriority(x.getPriority());
         return ans;
     }
 }

@@ -59,4 +59,16 @@ public abstract class Node {
      * @see kodkod.util.nodes.PrettyPrinter
      */
     public abstract String toString();
+
+    //TODO[mookichi]
+    private long priority = 0;
+
+    public void setPriority(long priority) {
+        this.priority = priority;
+    }
+
+    public long getPriority() {
+        return priority;
+    }
+
 }

@@ -36,5 +36,6 @@ public interface WTargetSATSolver extends TargetSATSolver {
 	 * @param lit the target
 	 * @param weight the weight
 	 */
-	public boolean addWeight(int lit, int weight);
+	// expand int to long to allow large weights
+	public boolean addWeight(int lit, long weight);
 }

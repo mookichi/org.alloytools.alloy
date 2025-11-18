@@ -907,8 +907,13 @@ public final class A4Solution {
             throw new ErrorFatal("Cannot shrink a Kodkod relation since solve() has completed.");
         TupleSet oldL = bounds.lowerBound(relation);
         TupleSet oldU = bounds.upperBound(relation);
-        if (oldU.containsAll(upperBound) && upperBound.containsAll(lowerBound) && lowerBound.containsAll(oldL)) {
+        // sometimes oldL / oldU is null.
+        boolean cond1 = oldL == null || lowerBound.containsAll(oldL);
+        boolean cond2 = oldU == null || oldU.containsAll(upperBound);
+        boolean cond3 = upperBound.containsAll(lowerBound);
+        if (cond1 && cond2 && cond3) {
             bounds.bound(relation, lowerBound, upperBound);
+            return;
         } else {
             throw new ErrorAPI("Inconsistent bounds shrinking on relation: " + relation);
         }
@@ -1655,6 +1660,8 @@ public final class A4Solution {
             sol = doKK(rep, opt);
         } else if (opt.solver instanceof CNFTransformer) {
             sol = doCNF(rep, opt);
+        } else if (opt.solver instanceof WCNFTransformer) {
+            sol = doWCNF(rep, opt);
         } else if (tryBookExamples && solver.solver instanceof AbstractKodkodSolver) {
             sol = tryBook(rep, cmd);
         } else if (!solver.options().solver().incremental()) {
@@ -1762,6 +1769,15 @@ public final class A4Solution {
         File tmpCNF = opt.tempFile(".cnf");
         String out = tmpCNF.getAbsolutePath();
         solver.options().setSolver(WriteCNF.factory(out));
+        Solution solve = solver.solve(fgoal, bounds);
+        solve.setOutput(tmpCNF);
+        return solve;
+    }
+
+        private Solution doWCNF(final A4Reporter rep, final A4Options opt) throws IOException {
+        File tmpCNF = opt.tempFile(".wcnf");
+        String out = tmpCNF.getAbsolutePath();
+        solver.options().setSolver(WriteWCNF.factory(out));
         Solution solve = solver.solve(fgoal, bounds);
         solve.setOutput(tmpCNF);
         return solve;

@@ -232,6 +232,8 @@ import java_cup.runtime.*;
 "'"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
 "‘"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
 "’"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
+"maximal"                   { return alloy_sym(yytext(), CompSym.MAXIMAL       );}
+"minimal"                   { return alloy_sym(yytext(), CompSym.MINIMAL       );}
 "%"                   { return alloy_sym(yytext(), CompSym.INTDIV       );}
 "%rem"                   { return alloy_sym(yytext(), CompSym.INTREM       );}
 

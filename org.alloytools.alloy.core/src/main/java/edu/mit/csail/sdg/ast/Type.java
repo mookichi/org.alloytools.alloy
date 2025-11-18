@@ -398,9 +398,6 @@ public final class Type implements Iterable<Type.ProductType>, Clause {
         for (ProductType e : entries) {
             if (e.arity() == 1 && e.get(0) == Sig.SIGINT)
             return true;
-            if (Sig.getSubInts() != null && Sig.getSubInts().containsValue(e.get(0))) {
-                return true;
-            }
         }
         return false;
     }

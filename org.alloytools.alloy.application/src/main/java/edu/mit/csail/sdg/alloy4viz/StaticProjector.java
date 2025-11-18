@@ -100,7 +100,11 @@ public final class StaticProjector {
             // If the relation still contains at least two types, it becomes a
             // new relation
             if (relTypes.size() > 1) {
-                relations.add(new AlloyRelation(rel.getName(), rel.isPrivate, rel.isMeta, rel.isVar, rel.isSkolem, relTypes));
+                AlloyRelation orel = new AlloyRelation(rel.getName(), rel.isPrivate, rel.isMeta, rel.isVar, rel.isSkolem, relTypes);
+                if (rel.getBitwidth() >= 0) {
+                    orel.setBitwidth(rel.getBitwidth());
+                }
+                relations.add(orel);
                 if (data != null)
                     data.put(rel, indices);
             }

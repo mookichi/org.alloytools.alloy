@@ -46,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.swing.JOptionPane;
+
 import org.alloytools.alloy.core.AlloyCore;
 import org.alloytools.alloy.dto.InstanceDTO;
 import org.alloytools.alloy.dto.SolutionDTO;
@@ -375,6 +377,7 @@ public final class A4Solution {
             Relation r = Relation.unary(name);
             a2k.put(sig, r);
             n2r.put(name, r);
+            sigs.add(sig);
         });
 
         TupleSet tset = factory.noneOf(1);

@@ -176,14 +176,14 @@ public class TableView {
 
                 SimTupleset sigInstances = SimTupleset.make(instancesArray);
                 Table table = new Table(sigInstances.size() + 1, s.getFields().size() + 1, 1);
-                table.set(0, 0, s.getBitwidth() >= 0 ? String.format("%s/%d", s.label, s.getBitwidth()) : s.label);
+                table.set(0, 0, s.getBitwidth() >= 0 ? String.format("%s::Int/%d", s.label, s.getBitwidth()) : s.label);
 
                 if (s.getFields().size() == 0 && sigInstances.size() < 1)
                     continue;
 
                 int c = 1;
                 for (Field f : s.getFields()) {
-                    table.set(0, c++, f.getBitwidth() >= 0 ? String.format("%s/%d", f.label, f.getBitwidth()) : f.label);
+                    table.set(0, c++, f.getBitwidth() >= 0 ? String.format("%s::Int/%d", f.label, f.getBitwidth()) : f.label);
                 }
 
                 map.put(s.label, table);
@@ -192,7 +192,13 @@ public class TableView {
                     assert sigInstance.arity() == 1;
                     SimTupleset leftJoin = SimTupleset.make(sigInstance);
 
-                    table.set(r, 0, sigInstance.get(0));
+                    if (s.getBitwidth() >= 0) {
+                        long val = StreamSupport.stream(leftJoin.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))
+                            .mapToLong(Y-> (Y == s.getBitwidth() - 1? -1L : 1L)<< Y).sum();
+                        table.set(r, 0, String.format("(%+d)", val));    
+                    } else {
+                        table.set(r, 0, sigInstance.get(0));
+                    }
                     c = 1;
                     for (Field f : s.getFields()) {
 
@@ -201,8 +207,8 @@ public class TableView {
 
                         if (f.getBitwidth() >= 0) {
                             long val = StreamSupport.stream(joined.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))
-                                .mapToLong(Y-> (Y == s.getBitwidth() - 1? -1L : 1L)<< Y).sum();
-                            table.set(r, c++, Long.toString(val));
+                                .mapToLong(Y-> (Y == f.getBitwidth() - 1? -1L : 1L)<< Y).sum();
+                            table.set(r, c++, String.format("(%+d)", val));
                         } else {
                             Table relationTable = toTable(joined);
                             table.set(r, c++, relationTable);

@@ -238,6 +238,9 @@ public abstract class Expr extends Browsable {
         if (type.is_int()) {
             return cast2int();
         }
+        if (getBitwidth() >= 0) {
+            return this;
+        }
         // else: error
         String msg = "This must be an integer expression.\nInstead, it has the following possible type(s):\n" + type;
         return NOOP.make(null, this, new ErrorType(span(), msg), 0);

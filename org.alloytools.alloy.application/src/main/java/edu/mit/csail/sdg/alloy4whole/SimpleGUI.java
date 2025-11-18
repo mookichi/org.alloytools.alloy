@@ -76,6 +76,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -85,6 +86,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.Action;
 import javax.swing.Box;
@@ -1855,7 +1857,23 @@ public final class SimpleGUI implements ComponentListener, Listener {
                     if (simInst.wasOverflow())
                         return simInst.visitThis(e).toString() + " (OF)";
                 }
-                return ans.eval(e, Integer.valueOf(strs[1])).toString();
+                String ret = ans.eval(e, Integer.valueOf(strs[1])).toString();
+                if (e.getBitwidth()  >= 0) {
+                    if (! ret.contains("->")) {
+                        return String.format("(%+d)", Arrays.stream(ret.replaceAll("[{}\\s]", "").split(","))
+                            .mapToInt(x-> Integer.parseInt(x))
+                            .mapToLong(x-> (x == e.getBitwidth() - 1 ? -1L : 1L)<< x).sum());
+                    }
+                    ret  = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("->(?!.*->)"))
+                        .collect(Collectors.groupingBy(
+                            x->  x[0],
+                            Collectors.mapping(
+                                x-> Integer.parseInt(x[1]), 
+                                Collectors.summingLong(x-> (x == e.getBitwidth() - 1 ? -1L : 1L)<< x)
+                            )
+                        )).toString().replaceAll("=", "->");
+                }
+                return ret;
             } catch (HigherOrderDeclException ex) {
                 throw new ErrorType("Higher-order quantification is not allowed in the evaluator.");
             }

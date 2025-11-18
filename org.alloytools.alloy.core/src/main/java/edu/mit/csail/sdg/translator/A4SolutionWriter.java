@@ -189,7 +189,7 @@ public final class A4SolutionWriter {
         if (x.isVariable != null)
             out.print("\" var=\"yes");
         if (x.getBitwidth() >= 0)
-            out.print(String.format("\" size=\"%d", x.getBitwidth()));
+            out.print(String.format("\" bitwidth=\"%d", x.getBitwidth()));
         out.print("\">\n");
         try {
             if (sol != null && x != Sig.UNIV && x != Sig.SIGINT && x != Sig.SEQIDX && !Sig.getSubInts().containsValue(x)) {

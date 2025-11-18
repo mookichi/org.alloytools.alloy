@@ -794,7 +794,7 @@ SigRef   ::= UNIV:x                   {: RESULT=ExprVar.make(x, "univ");        
 SigRef   ::= STRING:x                 {: RESULT=ExprVar.make(x, "String");            :};
 SigRef   ::= TIME:x                   {: RESULT=ExprVar.make(x, "steps");             :};
 SigRef   ::= SIGINT:x                 {: RESULT=ExprVar.make(x, "Int");               :};
-SigRef   ::= SIGINT:x SLASH NUMBER:m {: RESULT=ExprVar.make(x, String.format("Int/%d", m.num)); RESULT.setMsb(m.num); :};
+SigRef   ::= SIGINT:x SLASH NUMBER:m {: RESULT=ExprVar.make(x, String.format("Int/%d", m.num)); :};
 SigRef   ::= SEQ:a SLASH SIGINT:b     {: RESULT=ExprVar.make(a.merge(b), "seq/Int");  :};
 SigRef   ::= NONE:x                   {: RESULT=ExprVar.make(x, "none");              :};
 

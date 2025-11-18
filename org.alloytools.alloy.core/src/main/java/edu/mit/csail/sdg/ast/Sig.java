@@ -94,10 +94,11 @@ public abstract class Sig extends Expr implements Clause {
         if (subInts.containsKey(name)) {
             return subInts.get(name);
         } else {
-            PrimSig newsig = new PrimSig(name, Pos.UNKNOWN, SIGINT, false, true);
+            PrimSig newsig = new PrimSig(name, SIGINT.pos, SIGINT, false, false);
+            SIGINT.children.add(newsig);
             subInts.put(name, newsig);
-            int size = Integer.parseInt((name + "/-1").split("/")[1]);
-            newsig.setBitwidth(size);
+            int bitwidth = Integer.parseInt((name + "/-1").split("/")[1]);
+            newsig.setBitwidth(bitwidth);
             return newsig;
         } 
     }
@@ -976,8 +977,12 @@ public abstract class Sig extends Expr implements Clause {
                                                          // symbol, we assume
                                                          // it's oneOf
         final Field[] f = new Field[labels.size()];
-        for (int i = 0; i < f.length; i++)
+        for (int i = 0; i < f.length; i++) {
             f[i] = new Field(pos, isPrivate, isMeta, isDisjoint, isDisjoint2, isVar, this, labels.get(i).pos, labels.get(i).label, bound);
+            if (bound.getBitwidth() >= 0) {
+                f[i].setBitwidth(bound.getBitwidth());
+            }
+        }
         final Decl d = new Decl(isPrivate, isDisjoint, isDisjoint2, isVar, Arrays.asList(f), bound);
         for (int i = 0; i < f.length; i++) {
             f[i].decl = d;

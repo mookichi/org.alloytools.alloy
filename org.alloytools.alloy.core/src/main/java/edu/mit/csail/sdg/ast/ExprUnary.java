@@ -274,11 +274,9 @@ public final class ExprUnary extends Expr {
                 // to clutter the output window with an extra useless report of
                 // "Multiplicity expression not allowed here!"
             }
-            int bitwidth = -1;
             extraError = null;
             switch (this) {
                 case NOOP :
-                    bitwidth = sub.getBitwidth();
                     break;
                 case NOT :
                 case AFTER :
@@ -310,6 +308,7 @@ public final class ExprUnary extends Expr {
                     sub = sub.typecheck_as_set();
             }
             Type type = sub.type;
+            int bitwidth = sub.getBitwidth();
             if (sub.errors.isEmpty())
                 switch (this) {
                     case EXACTLYOF :
@@ -336,9 +335,11 @@ public final class ExprUnary extends Expr {
                     case HISTORICALLY :
                     case ONCE :
                         type = Type.FORMULA;
+                        bitwidth = -1;
                         break;
                     case TRANSPOSE :
                         type = sub.type.transpose();
+                        bitwidth = -1;
                         if (type == EMPTY)
                             extraError = new ErrorType(sub.span(), "~ can be used only with a binary relation.\n" + "Instead, its possible type(s) are:\n" + sub.type);
                         break;
@@ -352,14 +353,17 @@ public final class ExprUnary extends Expr {
                         break;
                     case CARDINALITY :
                         type = Type.smallIntType();
+                        bitwidth = -1;
                         break;
                     case CAST2INT :
                         if (!sub.type.hasArity(1))
                             extraError = new ErrorType(sub.span(), "int[] can be used only with a unary set.\n" + "Instead, its possible type(s) are:\n" + sub.type);
                         type = Type.smallIntType();
+                        bitwidth = -1;
                         break;
                     case CAST2SIGINT :
                         type = SIGINT.type;
+                        bitwidth = -1;
                         break;
                 }
             if (bitwidth >= 0 && type.is_int())

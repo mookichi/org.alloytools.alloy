@@ -49,7 +49,9 @@ public class ZZDebug{
 
         // A4Solution sol = null;
 
-        new VizGUI(false, "_Debug2.xml", null, null, null, 1).doShowTable();//.loadThemeFile("thm.thm");
+        VizGUI vg =  new VizGUI(false, "_Debug2.xml", null, null, null, 1);
+        vg.doShowViz();
+        vg.loadThemeFile("/home/vscode/theme.thm");
 
         // var x = 3;
 
@@ -76,7 +78,7 @@ public class ZZDebug{
         A4Reporter rep = new A4Reporter();
 
         // String model = "sig Y {} \n sig X extends Int/2 {}\n run {}";
-        String model = "one sig X {n : some Int/5} \nsome sig  Y in Int/3 {}\nrun {X.n  + #X.n = 7} for 8 int";
+        String model = "one sig X {n : some Int/6} \nsome sig  Y in Int/3 {}\nrun {X.n = 19} for 8 int";
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

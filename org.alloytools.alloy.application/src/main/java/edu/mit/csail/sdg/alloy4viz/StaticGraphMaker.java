@@ -16,6 +16,7 @@
 package edu.mit.csail.sdg.alloy4viz;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -413,8 +415,15 @@ public final class StaticGraphMaker {
             if (list == null)
                 attribs.put(node, list = new TreeSet<String>());
             String attr = e.getValue();
-            if (view.label.get(rel).length() > 0)
-                attr = view.label.get(rel) + ": " + attr;
+            if (view.label.get(rel).length() > 0) {
+                if (rel.getBitwidth() >=0)  {
+                    long val = Arrays.stream(attr.split(", *")).mapToInt(x-> Integer.parseInt(x))
+                        .mapToLong(i-> (i == rel.getBitwidth() - 1 ? -1L : 1L)<< i).sum();
+                    attr = String.format("%s=%d", view.label.get(rel), val);
+                } else {
+                    attr = view.label.get(rel) + ": " + attr;
+                }
+            }
             list.add(attr);
         }
     }

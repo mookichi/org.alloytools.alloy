@@ -230,8 +230,8 @@ public final class AlloyInstance {
                     AlloyAtom a = tuple.getAtoms().get(i);
                     if (!this.atom2sets.containsKey(a))
                         break; // Every atom must exist
-                    if (!model.isEqualOrSubtype(a.getType(), rel.getTypes().get(i)))
-                        break; // Atom must match the type
+                    // if (!model.isEqualOrSubtype(a.getType(), rel.getTypes().get(i)))
+                    //     break; // Atom must match the type
                 }
             }
             if (tuples.size() != 0)

@@ -356,6 +356,9 @@ public final class StaticInstanceReader {
                         mask = mask.product(ps.get(i));
                 }
                 AlloyRelation rel = makeRel(label, isPrivate, isMeta, isVar, isSkolem, types);
+                if (ps.get(ps.size() - 1).getBitwidth() >= 0) {
+                    rel.setBitwidth(ps.get(ps.size() - 1).getBitwidth());
+                }
                 Set<AlloyTuple> ts = new LinkedHashSet<AlloyTuple>();
                 for (A4Tuple tp : (A4TupleSet) (sol.eval(expr.intersect(mask), state))) {
                     AlloyAtom[] atoms = new AlloyAtom[tp.arity()];

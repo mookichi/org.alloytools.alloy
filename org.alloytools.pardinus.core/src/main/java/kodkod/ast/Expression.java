@@ -66,30 +66,6 @@ import kodkod.util.collections.Containers;
  */
 public abstract class Expression extends Node {
 
-    /**
-     * The bitwidth of this expression. -1 means unknown. Non-negative values are
-     * the actual bitwidths.
-     */
-    private  int bitwidth = -1;
-	
-    /**
-     * Returns the bitwidth of this expression.
-     * 
-     * @return the bitwidth of this expression
-     */
-	public int getBitwidth() {
-        return bitwidth;
-    }
-
-    /**
-     * Sets the bitwidth for this expression.
-     * 
-     * @param bitwidth the maximum bitwidth to set as the bitwidth of this expression
-     */
-    public void setBitwidth(int bitwidth) {
-        this.bitwidth = bitwidth;
-    }
-
     /** The universal relation:  contains all atoms in a {@link kodkod.instance.Universe universe of discourse}. */
 	public static final Expression UNIV = new ConstantExpression("univ", 1);
 	

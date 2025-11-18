@@ -87,4 +87,23 @@ public abstract class BooleanValue implements Comparable<BooleanValue> {
 	public void setPriority(long priority) {
 		this.priority = priority;
 	}
+	
+	/**
+	 * bitwidth for int/bitvector. -1 if not  int/bitvector.
+	 */
+	private int bitwidth = -1;
+	/**
+	 * get bitwidth
+	 *  @return bitwidth
+	 */
+	public int getBitwidth() {
+		return bitwidth;
+	}	
+	/**
+	 * set bitwidth
+	 * @param bitwidth
+	 */
+	public void setBitwidth(int bitwidth) {
+		this.bitwidth = bitwidth;
+	}
 }

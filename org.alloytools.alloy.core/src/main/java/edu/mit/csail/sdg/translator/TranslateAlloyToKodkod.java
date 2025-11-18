@@ -851,11 +851,10 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     public Object visit(ExprUnary x) throws Err {
         switch (x.op) {
             case EXACTLYOF :
-            case SOMEOF :
             case LONEOF :
             case ONEOF :
             case SETOF :
-                return cset(x.sub);
+            return cset(x.sub);
             case NOOP :
                 if (x.sub.getPriority() != 0) {
                     final Node ret = (Node) visitThis(x.sub);

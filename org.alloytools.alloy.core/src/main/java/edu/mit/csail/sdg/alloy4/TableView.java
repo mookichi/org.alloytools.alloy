@@ -175,7 +175,8 @@ public class TableView {
                 sortTuple(instancesArray);
 
                 SimTupleset sigInstances = SimTupleset.make(instancesArray);
-                Table table = new Table(sigInstances.size() + 1, s.getFields().size() + 1, 1);
+
+                Table table = new Table(s.getBitwidth() >= 0 ? 2 : sigInstances.size() + 1, s.getFields().size() + 1, 1);
                 table.set(0, 0, s.getBitwidth() >= 0 ? String.format("%s::Int/%d", s.label, s.getBitwidth()) : s.label);
 
                 if (s.getFields().size() == 0 && sigInstances.size() < 1)
@@ -193,9 +194,10 @@ public class TableView {
                     SimTupleset leftJoin = SimTupleset.make(sigInstance);
 
                     if (s.getBitwidth() >= 0) {
-                        long val = StreamSupport.stream(leftJoin.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))
+                        long val = StreamSupport.stream(sigInstances.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))
                             .mapToLong(Y-> (Y == s.getBitwidth() - 1? -1L : 1L)<< Y).sum();
-                        table.set(r, 0, String.format("(%+d)", val));    
+                        table.set(r, 0, String.format("(%+d)", val));
+                        break;
                     } else {
                         table.set(r, 0, sigInstance.get(0));
                     }

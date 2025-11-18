@@ -193,7 +193,9 @@ public final class ExprConstant extends Expr {
          * @param number - the number (this argument is ignored if op!=NUMBER)
          */
         public final ExprConstant make(Pos pos, int number) {
-            return new ExprConstant(pos, this, number, "");
+            ExprConstant ret =  new ExprConstant(pos, this, number, "");
+            ret.setBitwidth(0);
+            return ret;
         }
 
         /**

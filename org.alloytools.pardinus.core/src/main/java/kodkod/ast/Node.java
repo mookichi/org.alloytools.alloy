@@ -71,4 +71,27 @@ public abstract class Node {
         return priority;
     }
 
+    /**
+     * The bitwidth of this expression. -1 means unknown. Non-negative values are
+     * the actual bitwidths.
+     */
+    private  int bitwidth = -1;
+	
+    /**
+     * Returns the bitwidth of this expression.
+     * 
+     * @return the bitwidth of this expression
+     */
+	public int getBitwidth() {
+        return bitwidth;
+    }
+
+    /**
+     * Sets the bitwidth for this expression.
+     * 
+     * @param bitwidth the maximum bitwidth to set as the bitwidth of this expression
+     */
+    public void setBitwidth(int bitwidth) {
+        this.bitwidth = bitwidth;
+    }
 }

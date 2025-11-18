@@ -30,8 +30,8 @@ public class ZZDebug{
         Command cmd = commands.get(0);
         A4Options opt = new A4Options();
         // opt.solver = new KKTransformer();
-        opt.solver = kodkod.solvers.SAT4JRef.INSTANCE;
-        // opt.solver = kodkod.solvers.PMaxSAT4JRef.INSTANCE;
+        // opt.solver = kodkod.solvers.SAT4JRef.INSTANCE;
+        opt.solver = kodkod.solvers.PMaxSAT4JRef.INSTANCE;
         // opt.decompose_mode = 1;
         // opt.solver = kodkod.engine.satlab.SATFactory.get("sat4j.pmax");
         // opt.solver = kodkod.engine.satlab.SATFactory.get("WCNF output");
@@ -78,7 +78,7 @@ public class ZZDebug{
         A4Reporter rep = new A4Reporter();
 
         // String model = "sig Y {} \n sig X extends Int/2 {}\n run {}";
-        String model = "one sig X {n : some Int/6} \nsome sig  Y in Int/3 {}\nrun {X.n = 19} for 8 int";
+        String model = "one sig X { nnn : set Int/7 }\nrun {X.nnn =0 - 5} for 12 int"; 
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

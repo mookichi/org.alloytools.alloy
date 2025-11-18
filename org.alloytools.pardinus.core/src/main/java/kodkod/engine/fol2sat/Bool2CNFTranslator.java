@@ -250,6 +250,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 			final int[] lastClause = n ? new int[multigate.size()+1] : null;
 			final int output = oLit * -sgn;
 			int i = 0;
+			int pos = 0;
 			for(BooleanFormula input : multigate) {
 				int iLit = input.accept(this, arg)[0];
 				if (p) {
@@ -258,15 +259,25 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 				if (n) { 
 					if (multigate.getPriority() != 0) {
 						// if multigate has maxsat priority
-						if (multigate.getPriority() < 0) { // minimal
-							((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority());
-						} else if (multigate.getPriority() > 0) { // maximal
-							((WTargetSATSolver) solver).addWeight(iLit, multigate.getPriority());
+						if (multigate.getBitwidth() >= 0) {
+							long w = (pos  == multigate.getBitwidth() - 1 ? -1L : 1L)<< pos;
+							if (multigate.getPriority() < 0) { // minimal
+								((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority() * w);
+							} else { // maximal
+								((WTargetSATSolver) solver).addWeight(iLit, multigate.getPriority() * w);
+							}
+						} else {
+							if (multigate.getPriority() < 0) { // minimal
+								((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority());
+							} else { // maximal
+								((WTargetSATSolver) solver).addWeight(iLit, multigate.getPriority());
+							}
 						}
 					} else {
 						lastClause[i++] = iLit * -sgn;
 					}
 				}
+				pos ++;
 			}
 			if (n && multigate.op() != Nary.NOP) {
 				lastClause[i] = oLit * sgn;

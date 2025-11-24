@@ -55,6 +55,9 @@ public final class UnaryTempFormula extends Formula {
         }
         this.formula = child;
         this.temporalOperator = op;
+        if (child.getPriority() != 0) {
+            this.setPriority(child.getPriority());
+        }
     }
 
     /**

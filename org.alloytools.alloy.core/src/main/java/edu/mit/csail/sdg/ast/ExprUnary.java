@@ -231,7 +231,11 @@ public final class ExprUnary extends Expr {
          *            ExprUnary's constructor never sees it)
          */
         public final Expr make(Pos pos, Expr sub) {
-            return make(pos, sub, null, 0);
+            Expr ret =  make(pos, sub, null, 0);
+            if (sub.getPriority() != 0) {
+                ret.setPriority(sub.getPriority());
+            }
+            return ret;
         }
 
         /**

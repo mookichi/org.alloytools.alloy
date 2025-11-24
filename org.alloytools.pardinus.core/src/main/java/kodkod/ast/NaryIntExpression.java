@@ -21,7 +21,9 @@
  */
 package kodkod.ast;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 import kodkod.ast.operator.IntOperator;
 import kodkod.ast.visitor.ReturnVisitor;

@@ -1858,18 +1858,21 @@ public final class SimpleGUI implements ComponentListener, Listener {
                         return simInst.visitThis(e).toString() + " (OF)";
                 }
                 String ret = ans.eval(e, Integer.valueOf(strs[1])).toString();
-                if (e.getBitwidth()  >= 0) {
+                int bitwidth = e.getBitwidth() == 0 ? ans.getBitwidth() : e.getBitwidth();
+                if (e.type().is_small_int()) {
+                    return String.format("'%+d'", Long.parseLong(ret));
+                } else if (bitwidth > 0) {
                     if (! ret.contains("->")) {
                         return String.format("(%+d)", Arrays.stream(ret.replaceAll("[{}\\s]", "").split(","))
                             .mapToInt(x-> Integer.parseInt(x))
-                            .mapToLong(x-> (x == e.getBitwidth() - 1 ? -1L : 1L)<< x).sum());
+                            .mapToLong(x-> (x == bitwidth- 1 ? -1L : 1L)<< x).sum());
                     }
                     ret  = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("->(?!.*->)"))
                         .collect(Collectors.groupingBy(
                             x->  x[0],
                             Collectors.mapping(
                                 x-> Integer.parseInt(x[1]), 
-                                Collectors.summingLong(x-> (x == e.getBitwidth() - 1 ? -1L : 1L)<< x)
+                                Collectors.summingLong(x-> (x == bitwidth - 1 ? -1L : 1L)<< x)
                             )
                         )).toString().replaceAll("=", "->");
                 }

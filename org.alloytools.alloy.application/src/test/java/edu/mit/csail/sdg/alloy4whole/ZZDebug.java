@@ -38,6 +38,7 @@ public class ZZDebug{
         // opt.solver = kodkod.engine.satlab.SATFactory.get("maxsat.external");
         opt.noOverflow = false;
         opt.symmetry = 20;
+        opt.skolemDepth = 3;
         // solve
         A4Solution sol = TranslateAlloyToKodkod.execute_command(rep, world.getAllSigs(), cmd, opt);
         // sol = sol.next();
@@ -76,9 +77,9 @@ public class ZZDebug{
 
     public static void main(String[] args) throws Err {
         A4Reporter rep = new A4Reporter();
-
-        // String model = "sig Y {} \n sig X extends Int/2 {}\n run {}";
-        String model = "one sig X { nnn : set Int/7 }\nrun {X.nnn =0 - 5} for 12 int"; 
+        // assert(3 < 2);
+        // String model = "sig Y {} 7 \n sig X extends Int/2 {}\n run {}";
+        String model = "some  sig X { var n : set Int/5}\n run {all x : X {maximal x.n; minimal x.n}} for 5 int, 3..3 steps ";
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

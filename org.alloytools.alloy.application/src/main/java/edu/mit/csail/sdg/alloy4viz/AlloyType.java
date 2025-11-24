@@ -15,6 +15,9 @@
 
 package edu.mit.csail.sdg.alloy4viz;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.mit.csail.sdg.alloy4.Util;
 
 /**
@@ -56,6 +59,12 @@ public final class AlloyType extends AlloyNodeElement {
      * re-constructing it.
      */
     public static final AlloyType SET    = new AlloyType("set", false, false, false, false, false, false, false);
+
+    /**
+     * Cache mapping a sub-integer type's string representation to its corresponding
+     * AlloyType instance.
+     */
+    private static Map<String, AlloyType> subIntType = new HashMap<>();
 
     /** Constructs an AlloyType object with that name. */
     public AlloyType(String name, boolean isOne, boolean isAbstract, boolean isBuiltin, boolean isPrivate, boolean isMeta, boolean isEnum, boolean isVar) {
@@ -169,5 +178,25 @@ public final class AlloyType extends AlloyNodeElement {
     @Override
     public int hashCode() {
         return getName().hashCode();
+    }
+    /**
+     * Returns the AlloyType instance representing a named "sub-integer" type.
+     *
+     * If an instance for the given name already exists in the internal cache (subIntType),
+     * that instance is returned. Otherwise, a new AlloyType configured as a sub-integer type
+     * is created, cached, and returned.
+     *
+     * @param s the name/key identifying the desired sub-integer type
+     * @return the cached or newly created AlloyType corresponding to the given name
+     */
+    public static AlloyType getSubIntType(String s) {
+        assert(s.matches("^Int/\\d+$"));
+        if (subIntType.containsKey(s)) {
+            return subIntType.get(s);
+        } else {
+            AlloyType  subInt = new AlloyType(s, false, false, true, false, false, false, false);
+            subIntType.put(s, subInt);
+            return subInt;
+        }
     }
 }

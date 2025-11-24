@@ -684,7 +684,11 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     private IntExpression cint(Expr x) throws Err {
         if (!x.errors.isEmpty())
             throw x.errors.pick();
-        return toInt(x, visitThis(x));
+                 IntExpression ret = toInt(x, visitThis(x));
+            if (x.getBitwidth() >= 0) {
+                ret.setBitwidth(x.getBitwidth());
+            }
+            return ret;
     }
 
     private IntExpression toInt(Expr x, Object y) throws Err, ErrorFatal {
@@ -715,14 +719,22 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     private Expression cset(Expr x) throws Err {
         if (!x.errors.isEmpty())
             throw x.errors.pick();
-        return toSet(x, visitThis(x));
+        Expression ret = toSet(x, visitThis(x));
+        if (x.getBitwidth() >= 0) {
+            ret.setBitwidth(x.getBitwidth());
+        }
+        return ret;
     }
 
     private Expression toSet(Expr x, Object y) throws Err, ErrorFatal {
         if (y instanceof Expression)
             return (Expression) y;
         if (y instanceof IntExpression)
-            return ((IntExpression) y).toExpression();
+            if (((IntExpression) y).getBitwidth() >= 0) {
+                return ((IntExpression) y).toBitset();
+            } else {
+                return ((IntExpression) y).toExpression();
+            }
         throw new ErrorFatal(x.span(), "This should have been a set or a relation.\nInstead it is " + y);
     }
 
@@ -878,8 +890,12 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 return k2pos(cform(x.sub).once(), x);
             case SOME :
                 if (x.getPriority() != 0) {
-                    Formula ret =  k2pos(cset(x.sub).some(), x);
-                    ret.setPriority(x.getPriority()); //propagate maxsat priority
+                    Expression ex = cset(x.sub);
+                    Formula ret =  k2pos(ex.some(), x);
+                    if (x.getPriority() != 0) {
+                        ex.setPriority(x.getPriority());
+                        ret.setPriority(x.getPriority()); //propagate maxsat priority
+                    }
                     return ret;
                 }
                 return k2pos(cset(x.sub).some(), x);
@@ -1242,7 +1258,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 i = cint(a);
                 return i.sha(cint(b));
             case PLUS :
-                if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0)) {
+                if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0 || a.type().is_small_int() || b.type().is_small_int())) {
                     return cint(a).plus(cint(b));
                 } else {
                     return cset(a).union(cset(b));
@@ -1263,7 +1279,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 if (a instanceof ExprConstant && ((ExprConstant) a).op == ExprConstant.Op.NUMBER && ((ExprConstant) a).num() == 0)
                     if (b instanceof ExprConstant && ((ExprConstant) b).op == ExprConstant.Op.NUMBER && ((ExprConstant) b).num() == max + 1)
                         return IntConstant.constant(min);
-                    if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0)) {
+                    if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0 || a.type().is_small_int() || b.type().is_small_int())) {
                         return cint(a).minus(cint(b));
                     } else {
                         return cset(a).difference(cset(b));
@@ -1308,7 +1324,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                 }
                 return s.join(s2);
             case EQUALS :
-                if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0)) {
+                if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0 || a.type().is_small_int() || b.type().is_small_int())) {
                     return k2pos(cint(a).eq(cint(b)), x);
                 }
                 objL = visitThis(a);
@@ -1321,6 +1337,9 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
                     f = eL.eq(eR);
                 return k2pos(f, x);
             case NOT_EQUALS :
+                if (a.type().arity() == 1 && (a.getBitwidth() >= 0 || b.getBitwidth() >= 0 || a.type().is_small_int() || b.type().is_small_int())) {
+                    return k2pos(cint(a).neq(cint(b)), x);
+                }
                 objL = visitThis(a);
                 objR = visitThis(b);
                 eL = toSet(a, objL);
@@ -1643,7 +1662,6 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
         Node ans = visit_qt(x.op, x.decls, x.sub);
         if (ans instanceof Formula)
             k2pos((Formula) ans, x);
-        ans.setPriority(x.getPriority());
         return ans;
     }
 }

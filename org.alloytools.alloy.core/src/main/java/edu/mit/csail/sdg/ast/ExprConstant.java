@@ -194,7 +194,7 @@ public final class ExprConstant extends Expr {
          */
         public final ExprConstant make(Pos pos, int number) {
             ExprConstant ret =  new ExprConstant(pos, this, number, "");
-            ret.setBitwidth(0);
+            ret.setBitwidth(0); //'0' means BooleanFactory::bitwidth();
             return ret;
         }
 

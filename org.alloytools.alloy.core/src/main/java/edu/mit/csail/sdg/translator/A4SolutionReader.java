@@ -316,8 +316,8 @@ public final class A4SolutionReader {
             , UNIV.join(type))[0];
         }
         TupleSet ts = parseTuples(node, arity);
-        if (node.getAttribute("size").length() > 0)
-            field.setBitwidth(Integer.parseInt(node.getAttribute("size")));
+        if (node.getAttribute("bitwidth").length() > 0)
+            field.setBitwidth(Integer.parseInt(node.getAttribute("bitwidth")));
         expr2ts.put(field, ts);
         return field;
     }

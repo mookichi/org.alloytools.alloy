@@ -52,10 +52,6 @@ import static edu.mit.csail.sdg.parser.CompSym.LONE_ARROW_ONE;
 import static edu.mit.csail.sdg.parser.CompSym.LONE_ARROW_SOME;
 import static edu.mit.csail.sdg.parser.CompSym.LT;
 import static edu.mit.csail.sdg.parser.CompSym.LTE;
-import static edu.mit.csail.sdg.parser.CompSym.MAXIMAL;
-import static edu.mit.csail.sdg.parser.CompSym.MAXIMAL2;
-import static edu.mit.csail.sdg.parser.CompSym.MINIMAL;
-import static edu.mit.csail.sdg.parser.CompSym.MINIMAL2;
 import static edu.mit.csail.sdg.parser.CompSym.MINUS;
 import static edu.mit.csail.sdg.parser.CompSym.NO;
 import static edu.mit.csail.sdg.parser.CompSym.NO2;
@@ -188,10 +184,6 @@ final class CompFilter implements Scanner {
                 c = ONE2;
             else if (a.sym == SOME)
                 c = SOME2;
-            else if (a.sym == MINIMAL)
-                c = MINIMAL2;
-            else if (a.sym == MAXIMAL)
-                c = MAXIMAL2;
             else
                 return last = a;
             final ArrayList<Symbol> temp = new ArrayList<Symbol>();

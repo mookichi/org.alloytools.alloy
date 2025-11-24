@@ -650,7 +650,6 @@ public final class CompModule extends Browsable implements Module {
                 for (ExprHasName v : d.names)
                     remove(v.label);
             Expr ret =  x.op.make(x.pos, x.closingBracket, decls.makeConst(), sub);
-            ret.setPriority(x.getPriority());
             return ret;
         }
 
@@ -672,7 +671,9 @@ public final class CompModule extends Browsable implements Module {
         @Override
         public Expr visit(ExprUnary x) throws Err {
             Expr ex = x.op.make(x.pos, visitThis(x.sub));
-            ex.setPriority(x.getPriority());
+            if (x.getPriority() != 0) {
+                ex.setPriority(x.getPriority());
+            }
             return ex;
         }
 
@@ -2124,11 +2125,6 @@ public final class CompModule extends Browsable implements Module {
             // for (int i = 0; i < names.length; i++)
             //     names[i] = d.names.get(i).label;
             Field[] fields = s.addTrickyField(d.span(), d.isPrivate, d.disjoint, d.disjoint2, null, d.isVar, d.names, bound);
-            for (Field f : fields) {
-                if (d.getBitwidth() >= 0) {
-                    f.setBitwidth(d.getBitwidth());
-                }
-            }
             final VisitQuery<Sig> q = new VisitQuery<Sig>() {
 
                 @Override

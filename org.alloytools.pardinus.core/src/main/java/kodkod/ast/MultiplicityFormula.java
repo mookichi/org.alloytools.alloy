@@ -51,6 +51,12 @@ public final class MultiplicityFormula extends Formula {
         if (multiplicity== null || expression == null) throw new NullPointerException("null arg");
         this.multiplicity = multiplicity;
         this.expression = expression;
+        if (expression.getBitwidth() >= 0) {
+            setBitwidth(expression.getBitwidth());
+        }
+        if (expression.getPriority() != 0) {
+            setPriority(expression.getPriority());
+        }
     }
     
     /**
@@ -86,6 +92,11 @@ public final class MultiplicityFormula extends Formula {
       * @see kodkod.ast.Node#toString()
       */
     public String toString() {
+        if (getPriority() > 0) {
+            return "maximal " + expression;
+        } else if (getPriority() < 0) {
+            return "minimal " + expression;
+        }
         return multiplicity + " " + expression;
     }
 }

@@ -1,0 +1,584 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "vmArgs": "-ea"
+        },
+        {
+            "type": "java",
+            "name": "DemoFileSystem",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.DemoFileSystem",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "ExampleCompilingFromSource",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.ExampleCompilingFromSource",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "ExampleUsingTheAPI",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.ExampleUsingTheAPI",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "ExampleUsingTheCompiler",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.ExampleUsingTheCompiler",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "InternalTest",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.InternalTest",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "PreferencesDialog",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.PreferencesDialog",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "SimpleGUI",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.SimpleGUI",
+            "vmArgs": "-ea",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "ZZDebug",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4whole.ZZDebug",
+            "vmArgs": "-ea",
+            "projectName": "org.alloytools.alloy.application"
+        },
+        {
+            "type": "java",
+            "name": "WorkerEngine",
+            "request": "launch",
+            "mainClass": "edu.mit.csail.sdg.alloy4.WorkerEngine",
+            "projectName": "org.alloytools.alloy.core"
+        },
+        {
+            "type": "java",
+            "name": "Alloy",
+            "request": "launch",
+            "mainClass": "org.alloytools.alloy.core.infra.Alloy",
+            "projectName": "org.alloytools.alloy.core"
+        },
+        {
+            "type": "java",
+            "name": "AlloyDispatcher",
+            "request": "launch",
+            "mainClass": "org.alloytools.alloy.core.infra.AlloyDispatcher",
+            "projectName": "org.alloytools.alloy.core"
+        },
+        {
+            "type": "java",
+            "name": "AlloyLanguageServer",
+            "request": "launch",
+            "mainClass": "org.alloytools.alloy.lsp.provider.AlloyLanguageServer",
+            "projectName": "org.alloytools.alloy.lsp"
+        },
+        {
+            "type": "java",
+            "name": "AbstractWorldDefinitions",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.AbstractWorldDefinitions",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Bigconfig",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Bigconfig",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "CeilingsAndFloors",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.CeilingsAndFloors",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "DNACuts",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.DNACuts",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "DiffEg",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.DiffEg",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Dijkstra",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Dijkstra",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "FileSystem",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.FileSystem",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GroupScheduling",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.GroupScheduling",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Handshake",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Handshake",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Hotel",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Hotel",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Lists",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Lists",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Netconfig",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Netconfig",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Pigeonhole",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Pigeonhole",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "RingElection",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.RingElection",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Toughnut",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Toughnut",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ToyFilesystem",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.ToyFilesystem",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ToyLists",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.ToyLists",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Trees",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Trees",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Viktor",
+            "request": "launch",
+            "mainClass": "kodkod.examples.alloy.Viktor",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "List",
+            "request": "launch",
+            "mainClass": "kodkod.examples.bmc.List",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ListCheck",
+            "request": "launch",
+            "mainClass": "kodkod.examples.bmc.ListCheck",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ListDebug",
+            "request": "launch",
+            "mainClass": "kodkod.examples.bmc.ListDebug",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ListRepair",
+            "request": "launch",
+            "mainClass": "kodkod.examples.bmc.ListRepair",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ListSynth",
+            "request": "launch",
+            "mainClass": "kodkod.examples.bmc.ListSynth",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "BlockedNQueens",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.BlockedNQueens",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "BlockedNQueens2",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.BlockedNQueens2",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GraphColoring",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.GraphColoring",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GraphColoring2",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.GraphColoring2",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "HamiltonianCycle",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.HamiltonianCycle",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "HamiltonianCycle2",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.HamiltonianCycle2",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "LatinSquare",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.LatinSquare",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "MagicSeries",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.MagicSeries",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "NQueens",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.NQueens",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SocialGolfer",
+            "request": "launch",
+            "mainClass": "kodkod.examples.csp.SocialGolfer",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "BigconfigP",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.decomp.BigconfigP",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ListsP",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.decomp.ListsP",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "PTCRISP",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.decomp.PTCRISP",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SocialGolferP",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.decomp.SocialGolferP",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "DijkstraT",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.temporal.DijkstraT",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "HotelT",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.temporal.HotelT",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "RingT",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.temporal.RingT",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "RingT2",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.temporal.RingT2",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SpanT",
+            "request": "launch",
+            "mainClass": "kodkod.examples.pardinus.temporal.SpanT",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Sudoku",
+            "request": "launch",
+            "mainClass": "kodkod.examples.sudoku.Sudoku",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SudokuDatabase",
+            "request": "launch",
+            "mainClass": "kodkod.examples.sudoku.SudokuDatabase",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ALG195",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.ALG195",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ALG195_1",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.ALG195_1",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ALG197",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.ALG197",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "ALG212",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.ALG212",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "COM008",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.COM008",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GEO091",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.GEO091",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GEO092",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.GEO092",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GEO115",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.GEO115",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GEO158",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.GEO158",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GEO159",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.GEO159",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "GRA013_026",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.GRA013_026",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "LAT258",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.LAT258",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "MED007",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.MED007",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "MED009",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.MED009",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "MGT066",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.MGT066",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "NUM374",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.NUM374",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "NUM378",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.NUM378",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SET943",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.SET943",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SET948",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.SET948",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "SET967",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.SET967",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "TOP020",
+            "request": "launch",
+            "mainClass": "kodkod.examples.tptp.TOP020",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Transpose4x4",
+            "request": "launch",
+            "mainClass": "kodkod.examples.xpose.Transpose4x4",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Transpose4x4UnaryL",
+            "request": "launch",
+            "mainClass": "kodkod.examples.xpose.Transpose4x4UnaryL",
+            "projectName": "org.alloytools.pardinus.core"
+        },
+        {
+            "type": "java",
+            "name": "Transpose4x4UnaryLR",
+            "request": "launch",
+            "mainClass": "kodkod.examples.xpose.Transpose4x4UnaryLR",
+            "projectName": "org.alloytools.pardinus.core"
+        }
+    ]
+}

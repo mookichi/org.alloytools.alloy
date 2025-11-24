@@ -28,6 +28,7 @@ import static kodkod.engine.bool.BooleanConstant.TRUE;
 import static kodkod.engine.bool.Operator.AND;
 import static kodkod.engine.bool.Operator.CONST;
 import static kodkod.engine.bool.Operator.ITE;
+import static kodkod.engine.bool.Operator.NOP;
 import static kodkod.engine.bool.Operator.NOT;
 import static kodkod.engine.bool.Operator.OR;
 import static kodkod.engine.bool.Operator.VAR;
@@ -481,7 +482,7 @@ final class CBCFactory {
 		 * @requires f0.op in (AND + OR) && f1.op = ITE
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
-			assert f0.op().ordinal < 2 && f1.op() == ITE;
+			assert f0.op().ordinal < 2 && (f1.op() == ITE || f1.op() == NOP );
 			if (f0.label() < f1.label()) // f0 created before f1
 				return cache(op, f1, f0); 
 			else
@@ -534,7 +535,7 @@ final class CBCFactory {
 		 * @requires f0.op = ITE && f1.op = NOT
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
-			assert f0.op() == ITE && f1.op() == NOT;
+			assert (f0.op() == ITE || f0.op() == NOP) && f1.op() == NOT;
 			if (f0.label()==-f1.label()) return op.shortCircuit();
 			else if (f0.label() < StrictMath.abs(f1.label()))  // f0 created before f1
 				return NoX.assemble(op, f1, f0);

@@ -517,11 +517,6 @@ public final class TranslateKodkodToJava implements VoidVisitor {
             return;
         String left = make(x.left());
         String right = make(x.right());
-        if (x.left().getPriority() != 0L) {
-            file.printf("Formula %s=%s.in(%s); ", newname, left, right);
-            file.printf("%s.setPriority(%d);%n", newname, x.left().getPriority());
-            return;
-        }
         switch (x.op()) {
             case EQUALS :
                 file.printf("Formula %s=%s.eq(%s);%n", newname, left, right);
@@ -918,11 +913,6 @@ public final class TranslateKodkodToJava implements VoidVisitor {
             return;
         String d = make(x.decls());
         String f = make(x.formula());
-        if (x.getPriority() != 0L) {
-            file.printf("Formula %s=%s.forAll(%s); ", newname, f, d);
-            file.printf("%s.setPriority(%d);%n", newname, x.getPriority());
-            return;
-    }
         switch (x.quantifier()) {
             case ALL :
                 file.printf("Formula %s=%s.forAll(%s);%n", newname, f, d);

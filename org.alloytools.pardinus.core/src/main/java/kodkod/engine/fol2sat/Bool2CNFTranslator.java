@@ -260,7 +260,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 					if (multigate.getPriority() != 0) {
 						// if multigate has maxsat priority
 						if (multigate.getBitwidth() >= 0) {
-							long w = (pos  == multigate.getBitwidth() - 1 ? -1L : 1L)<< pos;
+							long w = (pos  == multigate.size() - 1 ? -1L : 1L)<< pos;
 							if (multigate.getPriority() < 0) { // minimal
 								((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority() * w);
 							} else { // maximal

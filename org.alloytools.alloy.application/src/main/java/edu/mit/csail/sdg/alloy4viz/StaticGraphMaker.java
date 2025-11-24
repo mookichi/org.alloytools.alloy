@@ -419,7 +419,7 @@ public final class StaticGraphMaker {
                 if (rel.getBitwidth() >=0)  {
                     long val = Arrays.stream(attr.split(", *")).mapToInt(x-> Integer.parseInt(x))
                         .mapToLong(i-> (i == rel.getBitwidth() - 1 ? -1L : 1L)<< i).sum();
-                    attr = String.format("%s=%d", view.label.get(rel), val);
+                    attr = String.format("%s= %+d", view.label.get(rel), val);
                 } else {
                     attr = view.label.get(rel) + ": " + attr;
                 }

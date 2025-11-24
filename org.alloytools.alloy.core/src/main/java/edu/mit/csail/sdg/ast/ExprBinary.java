@@ -426,6 +426,10 @@ public final class ExprBinary extends Expr {
                                 break;
                             }
                         } else {
+                            if (left.getBitwidth() >= 0 || right.getBitwidth() >= 0) {
+                                type = Type.smallIntType();
+                                break;
+                            }
                             type = (this == PLUS ? left.type.unionWithCommonArity(right.type) : left.type.pickCommonArity(right.type));
                             if (type != EMPTY)
                                 break;

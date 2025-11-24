@@ -400,6 +400,9 @@ public final class StaticInstanceReader {
             sig2type.put(Sig.SIGINT, AlloyType.INT);
             sig2type.put(Sig.SEQIDX, AlloyType.SEQINT);
             sig2type.put(Sig.STRING, AlloyType.STRING);
+            for (PrimSig subInt : Sig.getSubInts().values()) {
+                sig2type.put(subInt, AlloyType.getSubIntType(subInt.label));
+            }
             ts.put(AlloyType.SEQINT, AlloyType.INT);
             for (int i = sol.min(), max = sol.max(), maxseq = sol.getMaxSeq(); i <= max; i++) {
                 AlloyAtom at = new AlloyAtom(i >= 0 && i < maxseq ? AlloyType.SEQINT : AlloyType.INT, i, "" + i);

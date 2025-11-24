@@ -379,6 +379,7 @@ class VarRelation extends Relation {
 
     @Override
     public Relation getExpansion() {
+        expanded.setBitwidth(getBitwidth());
         return expanded;
     }
 

@@ -254,7 +254,8 @@ final class LeafInterpreter {
 	 *            m.elements[i].label < m.elements[j].label <=> i < j }
 	 * @throws UnboundLeafException  r !in this.relations
 	 */
-	public final BooleanMatrix interpret(Relation r) {
+	public final BooleanMatrix interpret(Relation r_a) {
+		Relation r = lowers.keySet().stream().filter(x-> x.name().equals(r_a.name())).findFirst().orElse(r_a);
 		if (!lowers.containsKey(r))
 			throw new UnboundLeafException("Unbound relation: ", r);
 		final IntSet lowerBound = lowers.get(r).indexView();

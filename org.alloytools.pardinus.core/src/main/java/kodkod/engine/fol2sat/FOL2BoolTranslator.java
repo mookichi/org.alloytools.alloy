@@ -642,13 +642,6 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		BooleanValue ret = lookup(quantFormula);
 		if (ret!=null) return ret;
 
-		if (quantFormula.getPriority() != 0L) {
-			final BooleanAccumulator or = BooleanAccumulator.treeGate(Operator.NOP);
-			some(quantFormula.decls(), quantFormula.formula(), 0, BooleanConstant.TRUE, or); 
-			ret = interpreter.factory().accumulate(or);
-			ret.setPriority(quantFormula.getPriority());
-			return cache(quantFormula,ret);
-		}
 		final Quantifier quantifier = quantFormula.quantifier();
 		switch(quantifier) {
 		case ALL		: 
@@ -759,13 +752,6 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		final BooleanMatrix right = compFormula.right().accept(this);
 		final ExprCompOperator op = compFormula.op();
 
-		if (compFormula.left().getPriority() != 0L) {
-			// if compFormula.lert has maxsat priority
-			ret = left.nop(env);
-			ret.setPriority(compFormula.left().getPriority());
-			ret = interpreter.factory().and(ret,  left.subset(right, env));
-			return cache(compFormula,ret);
-		}
 		switch(op) {
 		case SUBSET	: ret = left.subset(right, env); break;
 		case EQUALS	: ret = left.eq(right, env); break;
@@ -793,8 +779,8 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		if (multFormula.getPriority() != 0L) { // if multFormula has maxsat priority
 			ret = child.nop(env);
 			ret.setPriority(multFormula.getPriority());
-			if (multFormula.expression().getBitwidth() >= 0) {
-				ret.setBitwidth(multFormula.expression().getBitwidth());
+			if (multFormula.getBitwidth() >= 0) {
+				ret.setBitwidth(multFormula.getBitwidth());
 			}
 			return cache(multFormula, ret);
 		}
@@ -923,7 +909,7 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 			final int mid = (low + high) / 2;
 			final Int lsum = sum(m, iter, low, mid);
 			final Int hsum = sum(m, iter, mid+1, high);
-			return lsum.plus(hsum);
+			return lsum.or(hsum);
 		}
 	}
 

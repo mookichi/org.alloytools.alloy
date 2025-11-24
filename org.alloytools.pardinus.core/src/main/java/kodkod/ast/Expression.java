@@ -39,8 +39,11 @@ import static kodkod.ast.operator.Multiplicity.LONE;
 import static kodkod.ast.operator.Multiplicity.NO;
 import static kodkod.ast.operator.Multiplicity.ONE;
 import static kodkod.ast.operator.Multiplicity.SOME;
+import static kodkod.ast.operator.TemporalOperator.ALWAYS;
+import static kodkod.ast.operator.TemporalOperator.EVENTUALLY;
 import static kodkod.ast.operator.TemporalOperator.PRIME;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -90,9 +93,20 @@ public abstract class Expression extends Node {
      * @return this.compose(JOIN, expr)
      */
     public final Expression join(Expression expr) {
+        assert(getBitwidth() < 0 || expr.getBitwidth() <0);
+        assert(getPriority() == 0 || expr.getPriority() == 0);
         Expression ret = compose(JOIN,expr);
+        if (getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
         if (expr.getBitwidth() >= 0) {
             ret.setBitwidth(expr.getBitwidth());
+        }
+        if (getPriority()!= 0 ) {
+            ret.setPriority(getPriority());
+        }
+        if (expr.getPriority()!= 0 ) {
+            ret.setPriority(expr.getPriority());
         }
         return ret;
     }
@@ -103,7 +117,15 @@ public abstract class Expression extends Node {
      * @return this.compose(PRODUCT, expr)
      */
     public final Expression product(Expression expr) {
-        return compose(PRODUCT,expr);
+        assert(getBitwidth() < 0 || expr.getBitwidth() <0);
+        Expression ret = compose(PRODUCT,expr);
+        if (getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        if (expr.getBitwidth() >= 0) {
+            ret.setBitwidth(expr.getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -112,7 +134,12 @@ public abstract class Expression extends Node {
      * @return this.compose(UNION, expr)
      */
     public final Expression union(Expression expr) {
-    	return compose(UNION,expr);
+        assert(getBitwidth() == expr.getBitwidth());
+        Expression ret = compose(UNION,expr);
+        if(getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -121,7 +148,12 @@ public abstract class Expression extends Node {
      * @return this.compose(DIFFERENCE, expr)
      */
     public final Expression difference(Expression expr) {
-    	return compose(DIFFERENCE,expr);
+        assert(getBitwidth() == expr.getBitwidth());
+    	Expression ret = compose(DIFFERENCE,expr);
+        if(getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -130,7 +162,12 @@ public abstract class Expression extends Node {
      * @return this.compose(INTERSECTION, expr)
      */
     public final Expression intersection(Expression expr) {
-    	return compose(INTERSECTION,expr);
+        assert(getBitwidth() == expr.getBitwidth());
+    	Expression ret =  compose(INTERSECTION,expr);
+        if(getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -139,7 +176,12 @@ public abstract class Expression extends Node {
      * @return this.compose(OVERRIDE, expr)
      */
     public final Expression override(Expression expr) {
-    	return compose(OVERRIDE,expr);
+        assert(getBitwidth() == expr.getBitwidth());
+    	Expression ret =  compose(OVERRIDE,expr);
+        if(getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -230,6 +272,7 @@ public abstract class Expression extends Node {
      * @return exprs.length=1 => exprs[0] else {e: Expression | e.children = exprs and e.op = this }
      */
     public static Expression compose(ExprOperator op, Expression...exprs) { 
+        assert(Arrays.stream(exprs).mapToInt(x-> x.getBitwidth()).distinct().count() == 1);
     	switch(exprs.length) { 
     	case 0 : 	throw new IllegalArgumentException("Expected at least one argument: " + Arrays.toString(exprs));
     	case 1 : 	return exprs[0];
@@ -244,6 +287,7 @@ public abstract class Expression extends Node {
      * @return exprs.size()=1 => exprs.iterator().next() else {e: Expression | e.children = exprs.toArray() and e.op = this }
      */
     public static Expression compose(ExprOperator op, Collection<? extends Expression> exprs) { 
+        assert(exprs.stream().mapToInt(x-> x.getBitwidth()).distinct().count() == 1);
     	switch(exprs.size()) { 
     	case 0 : 	throw new IllegalArgumentException("Expected at least one argument: " + exprs);
     	case 1 : 	return exprs.iterator().next();
@@ -292,7 +336,11 @@ public abstract class Expression extends Node {
      * @return this.apply(PRIME)
      */
     public final Expression prime() {
-    	return apply(PRIME);
+    	Expression ret =  apply(PRIME);
+        if (getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -303,7 +351,19 @@ public abstract class Expression extends Node {
      * @throws IllegalArgumentException  this.arity != 2
      */
     public final Expression apply(ExprOperator op) {
-    	return new UnaryExpression(op, this);
+    	Expression ret = new UnaryExpression(op, this);
+        switch (op) {
+            case DIFFERENCE:
+            case INTERSECTION:
+            case OVERRIDE:
+            case PRODUCT:
+            case CLOSURE:
+            case JOIN:
+            case REFLEXIVE_CLOSURE:
+            case TRANSPOSE:
+            case UNION:
+        }
+        return ret;
     }
 
     /**
@@ -315,7 +375,26 @@ public abstract class Expression extends Node {
      */
     // [HASLab]
     public final Expression apply(TemporalOperator op) {
-    	return new TempExpression(op, this);
+        Expression ret =  new TempExpression(op, this);
+        switch (op) {
+            case AFTER:
+            case ALWAYS:
+            case  BEFORE:
+            case  EVENTUALLY:
+            case HISTORICALLY:
+            case ONCE:
+            case RELEASES:
+            case SINCE:
+            case TRIGGERED:
+            case UNTIL:
+            break;
+            case PRIME :
+                if (getBitwidth() >= 0) {
+                    ret.setBitwidth(getBitwidth());
+                }
+            break;
+        }
+        return ret;
     }
 
     /**
@@ -333,7 +412,9 @@ public abstract class Expression extends Node {
      * @return this.apply(CARDINALITY)
      */
     public final IntExpression count() {
-    	return apply(CARDINALITY);
+    	IntExpression ret = apply(CARDINALITY);
+        ret.setBitwidth(0);
+        return ret;
     }
     
     /**
@@ -342,7 +423,11 @@ public abstract class Expression extends Node {
      * @return this.apply(SUM)
      */
     public final IntExpression sum() {
-    	return apply(SUM);
+        IntExpression ret =  apply(SUM);
+        if (getBitwidth() >= 0) {
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**
@@ -352,7 +437,16 @@ public abstract class Expression extends Node {
      * @return {e: IntExpression | e.op = op && e.expression = this} 
      */
     public final IntExpression apply(ExprCastOperator op) { 
-    	return new ExprToIntCast(this, op);
+    	IntExpression ret =  new ExprToIntCast(this, op);
+        switch (op) {
+            case CARDINALITY: 
+                setBitwidth(0);
+            case SUM:
+                if (getBitwidth() >= 0) {
+                    ret.setBitwidth(getBitwidth());
+                }
+        }
+        return ret;
     }
     
     /**
@@ -425,7 +519,11 @@ public abstract class Expression extends Node {
      * @throws IllegalArgumentException  mult = SET
      */
     public final Formula apply(Multiplicity mult) {
-    	return new MultiplicityFormula(mult, this);
+        Formula ret = new  MultiplicityFormula(mult, this);
+        if (getPriority() != 0 && getBitwidth() >=0) { // minimal/maximal over integer case
+            ret.setBitwidth(getBitwidth());
+        }
+        return ret;
     }
     
     /**

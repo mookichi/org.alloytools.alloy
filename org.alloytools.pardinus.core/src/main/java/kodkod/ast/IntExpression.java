@@ -269,7 +269,11 @@ public abstract class IntExpression extends Node {
 	public final IntExpression compose(IntOperator op, IntExpression intExpr) {
 		if (op==null || intExpr==null)
 			throw new NullPointerException();
-		return new BinaryIntExpression(this, op, intExpr);	
+		IntExpression ret = new BinaryIntExpression(this, op, intExpr);	
+		switch (op) {
+			default: ret.setBitwidth(0);
+		}
+		return ret;
 	}
 	
 	/**
@@ -365,15 +369,23 @@ public abstract class IntExpression extends Node {
      * @return intExprs.size() = 1 => intExprs.iterator().next() else {e: IntExpression | e.children = intExprs.toArray() and e.op = this }
      */
     public static IntExpression compose(IntOperator op, Collection<? extends IntExpression> intExprs) { 
-    	switch(intExprs.size()) { 
-    	case 0 : 	throw new IllegalArgumentException("Expected at least one argument: " + intExprs);
-    	case 1 : 	return intExprs.iterator().next();
-    	case 2 :
-    		final Iterator<? extends IntExpression> itr = intExprs.iterator();
-    		return new BinaryIntExpression(itr.next(), op, itr.next());
-    	default : 			
-    		return new NaryIntExpression(op, intExprs.toArray(new IntExpression[intExprs.size()]));
-    	}
+		switch (intExprs.size()) {
+			case 0:
+				throw new IllegalArgumentException("Expected at least one argument: " + intExprs);
+			case 1:
+				return intExprs.iterator().next();
+			case 2: {
+				final Iterator<? extends IntExpression> itr = intExprs.iterator();
+				final IntExpression ret = new BinaryIntExpression(itr.next(), op, itr.next());
+				ret.setBitwidth(0);
+				return ret;
+			}
+			default: {
+				final IntExpression ret = new NaryIntExpression(op, intExprs.toArray(new IntExpression[intExprs.size()]));
+				ret.setBitwidth(0);
+				return ret;
+			}
+		}
     }
 	
 	/**
@@ -439,7 +451,11 @@ public abstract class IntExpression extends Node {
 	 * @return this.cast(BITSETCAST)
 	 */
 	public final Expression toBitset() { 
-		return cast(BITSETCAST);
+		final Expression ret = cast(BITSETCAST);
+		if (getBitwidth() >= 0) {
+			ret.setBitwidth(getBitwidth());
+		}
+		return ret;
 	}
 	
 	/**

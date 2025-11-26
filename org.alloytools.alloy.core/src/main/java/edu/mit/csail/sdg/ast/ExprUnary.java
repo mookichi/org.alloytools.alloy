@@ -232,6 +232,9 @@ public final class ExprUnary extends Expr {
          */
         public final Expr make(Pos pos, Expr sub) {
             Expr ret =  make(pos, sub, null, 0);
+            if (sub.getBitwidth() >= 0) {
+                ret.setBitwidth(sub.getBitwidth());
+            }
             if (sub.getPriority() != 0) {
                 ret.setPriority(sub.getPriority());
             }

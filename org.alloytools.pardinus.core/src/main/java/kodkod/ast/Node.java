@@ -60,13 +60,31 @@ public abstract class Node {
      */
     public abstract String toString();
 
-    //TODO[mookichi]
-    private long priority = 0;
+    /**
+     * Numeric priority for this node.
+     *
+     * This value is refferd as the "priority" for maxsat-solver's weighting.
+     */
+    private long priority = 0L;
 
+    /**
+     * Sets the priority value associated with this node.
+     *
+     * The priority may be used by algorithms that order or weight nodes.
+     *
+     * @param priority the new priority value for this node
+     */
     public void setPriority(long priority) {
         this.priority = priority;
     }
 
+    /**
+     * Returns the priority associated with this node.
+     *
+     * The priority is represented as a long value.
+     *
+     * @return the priority value of this node
+     */
     public long getPriority() {
         return priority;
     }

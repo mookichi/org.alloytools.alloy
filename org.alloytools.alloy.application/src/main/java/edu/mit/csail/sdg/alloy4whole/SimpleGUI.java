@@ -174,6 +174,7 @@ import edu.mit.csail.sdg.ast.ExprVar;
 import edu.mit.csail.sdg.ast.Module;
 import edu.mit.csail.sdg.ast.Sig;
 import edu.mit.csail.sdg.ast.Sig.Field;
+import edu.mit.csail.sdg.ast.Sig.PrimSig;
 import edu.mit.csail.sdg.parser.CompUtil;
 import edu.mit.csail.sdg.sim.SimInstance;
 import edu.mit.csail.sdg.sim.SimTuple;
@@ -1859,22 +1860,39 @@ public final class SimpleGUI implements ComponentListener, Listener {
                 }
                 String ret = ans.eval(e, Integer.valueOf(strs[1])).toString();
                 int bitwidth = e.getBitwidth() == 0 ? ans.getBitwidth() : e.getBitwidth();
-                if (e.type().is_small_int()) {
+                final List<PrimSig> et = e.type().fold().get(0);
+                if (et.size() == 1 && e.type().is_small_int()) {
                     return String.format("'%+d'", Long.parseLong(ret));
-                } else if (bitwidth > 0) {
-                    if (! ret.contains("->")) {
-                        return String.format("(%+d)", Arrays.stream(ret.replaceAll("[{}\\s]", "").split(","))
-                            .mapToInt(x-> Integer.parseInt(x))
-                            .mapToLong(x-> (x == bitwidth- 1 ? -1L : 1L)<< x).sum());
+                } else if (ret.matches("true|false")) {
+                    return ret;
+                } else if (et.size() > 1 && e.getBitwidth() >=0) {
+                    if (e.type().fold().get(0).get(e.type().arity() - 1).getBitwidth() >= 0) {
+                        return Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("->(?!.*->)"))
+                            .collect(Collectors.groupingBy(
+                                x->  x[0],
+                                Collectors.mapping(
+                                    x-> Integer.parseInt(x[1]), 
+                                    Collectors.summingLong(x-> (x == bitwidth - 1 ? -1L : 1L)<< x)
+                                )
+                            )).toString().replaceAll("=", "->");      
+                    } else if (e.type().fold().get(0).get(0).getBitwidth() >= 0) {
+                        String tab = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("(?<!->.*)->"))
+                            .collect(Collectors.groupingBy(
+                                x->  x[1],
+                                Collectors.mapping(
+                                    x-> Integer.parseInt(x[0]), 
+                                    Collectors.summingLong(x-> (x == bitwidth - 1 ? -1L : 1L)<< x)
+                                )
+                            )).entrySet().stream().map(X-> String.format("%+d->%s", X.getValue(), X.getKey()))
+                                .collect(Collectors.joining(", "));
+                            return String.format("{%s}", tab);   
+                    } else if (bitwidth > 0) {
+                        if (et.size() > 1) {
+                            return String.format("(%+d)", Arrays.stream(ret.replaceAll("[{}\\s]", "").split(","))
+                                .mapToInt(x-> Integer.parseInt(x))
+                                .mapToLong(x-> (x == bitwidth- 1 ? -1L : 1L)<< x).sum());
+                        }
                     }
-                    ret  = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("->(?!.*->)"))
-                        .collect(Collectors.groupingBy(
-                            x->  x[0],
-                            Collectors.mapping(
-                                x-> Integer.parseInt(x[1]), 
-                                Collectors.summingLong(x-> (x == bitwidth - 1 ? -1L : 1L)<< x)
-                            )
-                        )).toString().replaceAll("=", "->");
                 }
                 return ret;
             } catch (HigherOrderDeclException ex) {

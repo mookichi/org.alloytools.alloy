@@ -72,7 +72,7 @@ public abstract class BooleanValue implements Comparable<BooleanValue> {
 	/**
 	 * maxsat priority
 	 */
-	private long priority = 0;
+	private long priority = 0L;
 	/**
 	 * get maxsat priority
 	 *  @return priority

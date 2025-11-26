@@ -232,9 +232,6 @@ public final class ExprUnary extends Expr {
          */
         public final Expr make(Pos pos, Expr sub) {
             Expr ret =  make(pos, sub, null, 0);
-            if (sub.getBitwidth() >= 0) {
-                ret.setBitwidth(sub.getBitwidth());
-            }
             if (sub.getPriority() != 0) {
                 ret.setPriority(sub.getPriority());
             }
@@ -360,21 +357,20 @@ public final class ExprUnary extends Expr {
                         break;
                     case CARDINALITY :
                         type = Type.smallIntType();
-                        bitwidth = -1;
                         break;
                     case CAST2INT :
                         if (!sub.type.hasArity(1))
                             extraError = new ErrorType(sub.span(), "int[] can be used only with a unary set.\n" + "Instead, its possible type(s) are:\n" + sub.type);
                         type = Type.smallIntType();
-                        bitwidth = -1;
                         break;
                     case CAST2SIGINT :
-                        type = SIGINT.type;
-                        bitwidth = -1;
+                        if (type.is_small_int()) {
+                            type = SIGINT.type;
+                        }
                         break;
                 }
-            if (bitwidth >= 0 && type.is_int())
-                type = Type.smallIntType();
+            // if (bitwidth >= 0 && type.is_int() && this != CAST2SIGINT)
+            //     type = Type.smallIntType();
             ExprUnary e =new ExprUnary(pos, this, sub, type, extraWeight + sub.weight, errors.make(extraError));
             if (bitwidth >= 0)
                 e.setBitwidth(bitwidth);
@@ -435,7 +431,7 @@ public final class ExprUnary extends Expr {
                 s = Type.removesBoolAndInt(sub.type);
                 break;
             case CAST2SIGINT :
-                s = Type.smallIntType();
+                // s = Type.smallIntType();
                 break;
             case CAST2INT :
                 s = sub.type.intersect(SIGINT.type);

@@ -1,5 +1,6 @@
 package edu.mit.csail.sdg.alloy4;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
@@ -206,11 +210,23 @@ public class TableView {
 
                         SimTupleset relations = Util.toSimTupleset(solution.eval(f, state));
                         SimTupleset joined = leftJoin.join(relations);
-
                         if (f.getBitwidth() >= 0) {
-                            long val = StreamSupport.stream(joined.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))
-                                .mapToLong(Y-> (Y == f.getBitwidth() - 1? -1L : 1L)<< Y).sum();
-                            table.set(r, c++, String.format("(%+d)", val));
+                            if (f.type().fold().get(0).get(1).getBitwidth() >= 0) {
+                                final var jstream = StreamSupport.stream(joined.spliterator(), false);
+                                final Function<SimTuple, String> kfun = x->x.tail(joined.arity() - 1).toString();
+                                final Collector<SimTuple, ?, Long> col = Collectors.mapping(
+                                    (SimTuple X)-> X.get(0).toInt(0), 
+                                    Collectors.summingLong(X-> (X == f.getBitwidth() - 1 ? -1L : 1L)<< X)
+                                );
+                                final Collector<SimTuple, ? ,Map<String,Long>> grp = Collectors.groupingBy(kfun, col);
+                                Map<String,Long> ans = jstream.collect(grp);
+                                String tab = ans.entrySet().stream().map(X-> String.format("(%+d)->%s", X.getValue(), X.getKey()))
+                                    .collect(Collectors.joining(", "));
+                                table.set(r, c++, toTable(String.format("{%s}", tab), false));
+                            }
+                            // long val = StreamSupport.stream(joined.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))
+                            //     .mapToLong(Y-> (Y == f.getBitwidth() - 1? -1L : 1L)<< Y).sum();
+                            // table.set(r, c++, String.format("(%+d)", val));
                         } else {
                             Table relationTable = toTable(joined);
                             table.set(r, c++, relationTable);

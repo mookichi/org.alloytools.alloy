@@ -41,7 +41,7 @@ public class TableView {
     final static String  SUPERSCRIPTS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
     final static String  SUBSCRIPTS   = "₀₁₂₃₄₅₆₇₈₉";
     final static String  BOX_SINGLE   = "│┌─┬┐┘┴└├┼┤";
-    final static Pattern TABLE_P      = Pattern.compile("\\s*\\{(([\\d\\w$\\s,>\"/-]+))\\}\\s*");
+    final static Pattern TABLE_P      = Pattern.compile("\\s*\\{(([\\d\\w$\\s,>\"/\\+\\-]+))\\}\\s*");
 
     public static boolean isTable(String input) {
         return TABLE_P.matcher(input).matches();
@@ -211,16 +211,30 @@ public class TableView {
                         SimTupleset relations = Util.toSimTupleset(solution.eval(f, state));
                         SimTupleset joined = leftJoin.join(relations);
                         if (f.getBitwidth() >= 0) {
-                            if (f.type().fold().get(0).get(1).getBitwidth() >= 0) {
-                                final var jstream = StreamSupport.stream(joined.spliterator(), false);
+                            final var jstream = StreamSupport.stream(joined.spliterator(), false);
+                            if (joined.arity() == 1) {
+                                Long val = jstream.mapToInt(X->X.get(0).toInt(0)).mapToLong(X->(X == f.getBitwidth() - 1 ? -1L : 1L)<< X).sum();
+                                table.set(r, c++, String.format("%+d", val));
+                            } else if (f.type().fold().get(0).get(1).getBitwidth() >= 0) {
                                 final Function<SimTuple, String> kfun = x->x.tail(joined.arity() - 1).toString();
                                 final Collector<SimTuple, ?, Long> col = Collectors.mapping(
-                                    (SimTuple X)-> X.get(0).toInt(0), 
+                                    (SimTuple X)-> X.tail().toInt(0), 
                                     Collectors.summingLong(X-> (X == f.getBitwidth() - 1 ? -1L : 1L)<< X)
                                 );
                                 final Collector<SimTuple, ? ,Map<String,Long>> grp = Collectors.groupingBy(kfun, col);
                                 Map<String,Long> ans = jstream.collect(grp);
-                                String tab = ans.entrySet().stream().map(X-> String.format("(%+d)->%s", X.getValue(), X.getKey()))
+                                String tab = ans.entrySet().stream().map(X-> String.format("%+d->%s", X.getValue(), X.getKey()))
+                                    .collect(Collectors.joining(", "));
+                                table.set(r, c++, toTable(String.format("{%s}", tab), false));
+                            } else if (f.type().fold().get(0).get(joined.arity()).getBitwidth() >= 0) {
+                                final Function<SimTuple, String> kfun = x->x.head(joined.arity() - 1).toString();
+                                final Collector<SimTuple, ?, Long> col = Collectors.mapping(
+                                    (SimTuple X)-> X.head().toInt(0), 
+                                    Collectors.summingLong(X-> (X == f.getBitwidth() - 1 ? -1L : 1L)<< X)
+                                );
+                                final Collector<SimTuple, ? ,Map<String,Long>> grp = Collectors.groupingBy(kfun, col);
+                                Map<String,Long> ans = jstream.collect(grp);
+                                String tab = ans.entrySet().stream().map(X-> String.format("%s->%+d", X.getKey(), X.getValue()))
                                     .collect(Collectors.joining(", "));
                                 table.set(r, c++, toTable(String.format("{%s}", tab), false));
                             }

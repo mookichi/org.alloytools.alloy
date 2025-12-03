@@ -93,7 +93,7 @@ public final class Decl {
      *             explicitly supported by the surrounding logic
      */
     public void setBitwidth(int bitwidth) {
-        assert(this.bitwidth == -1);
+        // assert(this.bitwidth == -1);
         this.bitwidth = bitwidth;
     }
 

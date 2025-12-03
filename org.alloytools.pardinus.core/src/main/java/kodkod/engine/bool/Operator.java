@@ -91,9 +91,14 @@ public abstract class Operator implements Comparable<Operator>{
 		/** @return true */
 		public BooleanConstant identity() { return BooleanConstant.TRUE; }
 		/** @return false */
-		public BooleanConstant shortCircuit() { return null; }
+		public BooleanConstant shortCircuit() { 
+			// throw new UnsupportedOperationException();
+			return null;
+		}
 		/** @return OR */
-		public Nary complement() {  return null; }
+		public Nary complement() {
+			throw new UnsupportedOperationException();
+		}
 	};
 
 	/**

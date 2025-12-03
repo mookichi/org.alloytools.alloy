@@ -28,7 +28,9 @@ import static kodkod.engine.bool.Operator.OR;
 import static kodkod.engine.bool.Operator.NOP;
 
 import java.util.Iterator;
+import java.util.stream.StreamSupport;
 
+import kodkod.ast.MultiplicityFormula;
 import kodkod.engine.fol2sat.Environment;
 import kodkod.util.collections.Containers;
 import kodkod.util.ints.ArraySequence;

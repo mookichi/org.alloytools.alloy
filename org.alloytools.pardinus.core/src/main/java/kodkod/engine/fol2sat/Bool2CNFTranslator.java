@@ -279,7 +279,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 				}
 				pos ++;
 			}
-			if (n && multigate.op() != Nary.NOP) {
+			if (n && multigate.getPriority() == 0) {
 				lastClause[i] = oLit * sgn;
 				solver.addClause(lastClause);
 			}

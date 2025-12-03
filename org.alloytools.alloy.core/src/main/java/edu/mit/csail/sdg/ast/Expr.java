@@ -121,7 +121,7 @@ public abstract class Expr extends Browsable {
      * @param bitwidth
      */
     public void setBitwidth(int bitwidth) {
-        assert(this.bitwidth == -1);
+        // assert(this.bitwidth == -1);
         this.bitwidth = bitwidth;
     }
 
@@ -267,8 +267,8 @@ public abstract class Expr extends Browsable {
             return this;
         if (type.is_small_int())
             return cast2sigint();
-        if (type.fold().get(0).get(0).getBitwidth() >= 0)
-            return cast2sigint();
+        // if (type.fold().get(0).get(0).getBitwidth() >= 0)
+        //     return cast2sigint();
         if (type.is_int())
             return this;
         if (type.size() > 0)

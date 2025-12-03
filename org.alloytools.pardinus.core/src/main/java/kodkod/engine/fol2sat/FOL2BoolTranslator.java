@@ -931,7 +931,10 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 			ret = expr.cardinality(); break;
 		case SUM         :
 			final IntSet ints = interpreter.ints();
-			ret = sum(expr, ints.iterator(ints.min(), intExpr.expression().getBitwidth() - 1), 0, intExpr.expression().getBitwidth()-1); break;
+			final int temp = intExpr.expression().getBitwidth();
+			final int bitwidth = temp == 0 ? ints.size() : temp;
+			ret = sum(expr, ints.iterator(ints.min(), bitwidth - 1), 0, bitwidth - 1); 
+			break;
 		default: 
 			throw new IllegalArgumentException("unknown operator: " + intExpr.op());
 		}

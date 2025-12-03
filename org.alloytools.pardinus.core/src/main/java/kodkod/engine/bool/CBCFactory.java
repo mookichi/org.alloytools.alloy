@@ -275,13 +275,14 @@ final class CBCFactory {
 	BooleanValue assemble(BooleanAccumulator acc) {
 		final int asize = acc.size();
 		final Operator.Nary op = acc.op;
-		switch(asize) {
-		case 0 : return op.identity();
-		case 1 : return acc.iterator().next();
-		case 2 : 
+		if (asize == 0) {
+			return op.identity();
+		} else if (op != NOP && asize == 1) {
+			return acc.iterator().next();
+		} else if (asize == 2) {
 			final Iterator<BooleanValue> inputs = acc.iterator();
 			return assemble(op, inputs.next(), inputs.next());
-		default :
+		} else {
 			final int hash = op.hash((Iterator)acc.iterator());
 			if (asize > cmpMax) {
 				for(Iterator<BooleanFormula> gates = opCache(op).get(hash); gates.hasNext(); ) {
@@ -535,7 +536,7 @@ final class CBCFactory {
 		 * @requires f0.op = ITE && f1.op = NOT
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
-			assert (f0.op() == ITE || f0.op() == NOP) && f1.op() == NOT;
+			assert (f0.op() == ITE) && f1.op() == NOT;
 			if (f0.label()==-f1.label()) return op.shortCircuit();
 			else if (f0.label() < StrictMath.abs(f1.label()))  // f0 created before f1
 				return NoX.assemble(op, f1, f0);

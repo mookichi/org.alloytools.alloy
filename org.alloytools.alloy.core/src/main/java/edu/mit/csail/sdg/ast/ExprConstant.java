@@ -89,7 +89,7 @@ public final class ExprConstant extends Expr {
      * @param num - the number (this argument is ignored if op!=NUMBER)
      */
     private ExprConstant(Pos pos, Op op, int num, String string) {
-        super(pos, null, false, (op == Op.IDEN ? Type.make2(UNIV) : (op == Op.NEXT ? Type.make2(Sig.SIGINT) : (op == Op.TRUE || op == Op.FALSE ? Type.FORMULA : (op == Op.EMPTYNESS ? UNIV.type : (op == Op.STRING ? Sig.STRING.type : Sig.subInt("Int/0").type))))), 0, 0, null);
+        super(pos, null, false, (op == Op.IDEN ? Type.make2(UNIV) : (op == Op.NEXT ? Type.make2(Sig.SIGINT) : (op == Op.TRUE || op == Op.FALSE ? Type.FORMULA : (op == Op.EMPTYNESS ? UNIV.type : (op == Op.STRING ? Sig.STRING.type : Type.smallIntType()))))), 0, 0, null);
         this.op = op;
         this.num = (op == Op.NUMBER ? num : 0);
         this.string = (op == Op.STRING ? string : "");

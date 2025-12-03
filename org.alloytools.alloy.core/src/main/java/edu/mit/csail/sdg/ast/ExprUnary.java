@@ -109,6 +109,15 @@ public final class ExprUnary extends Expr {
                     return;
                 case NOOP :
                     break;
+                case SOME :
+                    if (getPriority() > 0) {
+                        out.append("maximal ");
+                    } else if (getPriority() < 0) {
+                        out.append("minimal ");
+                    } else {
+                        out.append("some ");
+                    }
+                    break;
                 default :
                     out.append(op).append(' ');
             }

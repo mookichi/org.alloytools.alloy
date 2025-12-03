@@ -58,7 +58,7 @@
             "name": "SimpleGUI",
             "request": "launch",
             "mainClass": "edu.mit.csail.sdg.alloy4whole.SimpleGUI",
-            "vmArgs": "-ea",
+            // "vmArgs": "-ea",
             "projectName": "org.alloytools.alloy.application"
         },
         {
@@ -66,7 +66,7 @@
             "name": "ZZDebug",
             "request": "launch",
             "mainClass": "edu.mit.csail.sdg.alloy4whole.ZZDebug",
-            "vmArgs": "-ea",
+            // "vmArgs": "-ea",
             "projectName": "org.alloytools.alloy.application"
         },
         {

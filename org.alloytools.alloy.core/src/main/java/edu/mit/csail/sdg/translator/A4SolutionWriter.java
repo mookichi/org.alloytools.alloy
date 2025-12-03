@@ -110,7 +110,7 @@ public final class A4SolutionWriter {
             Expr sum = type.toExpr();
             int lastSize = (-1);
             while (true) {
-                A4TupleSet ts = (A4TupleSet) (sol.eval(expr.minus(sum), state));
+                A4TupleSet ts = ((A4TupleSet) sol.eval(expr, state)).minus((A4TupleSet) sol.eval(sum, state));
                 int n = ts.size();
                 // [electrum] the value of mutable skolem vars may use atoms not present in the current state (from quantifications and auxiliary functions)
                 if (n <= 0 || expr instanceof ExprVar || expr instanceof ExprCall)

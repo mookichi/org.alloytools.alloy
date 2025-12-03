@@ -77,30 +77,43 @@ public abstract class Sig extends Expr implements Clause {
     }
 
     /**
+     * Static initializer to create the "Int/0" sub-integer signature and add it to
+     */
+    static {
+        PrimSig sig = new PrimSig("Int/0", SIGINT.pos, SIGINT, false, true);
+        subInts.put("Int/0", sig);
+        subInt("Int/0").setBitwidth(0);
+    }
+    
+    /**
      * Returns a PrimSig representing a sub-integer signature with the given name.
      *
-     * If a signature with that name already exists in the internal cache (subInts),
-     * the cached instance is returned. Otherwise a new PrimSig is created (using
-     * Pos.UNKNOWN and SIGINT), stored in the cache, and returned.
-     *
-     * This method mutates the internal cache (subInts). Callers should provide a
-     * non-null name; behavior for null is implementation-dependent.
-     *
      * @param name the name of the sub-integer signature
-     * @return the existing or newly created PrimSig corresponding to the given name
+     * @return the PrimSig corresponding to the given name
      */
     public static PrimSig subInt(String name) {
-        assert (name.matches("^Int/\\d+$"));
-        if (subInts.containsKey(name)) {
-            return subInts.get(name);
-        } else {
-            PrimSig newsig = new PrimSig(name, SIGINT.pos, SIGINT, false, false);
-            SIGINT.children.add(newsig);
+        if (!subInts.containsKey(name)) {
+            // temporary hack: always base new sub-int on "Int/0"
+            PrimSig int_0 = subInt("Int/0");
+            PrimSig newsig = new PrimSig(name, int_0.pos, int_0, false, true);
             subInts.put(name, newsig);
-            int bitwidth = Integer.parseInt((name + "/-1").split("/")[1]);
+        }
+        return subInts.get(name);
+    }
+
+    /**
+     * Creates sub-integer signatures from "Int/1" up to "Int/max", and adds them
+     * @param max   the maximum bitwidth for the sub-integer signatures to create
+     */
+    public static void CreateSubInt(int max) {
+        PrimSig sig = subInts.get("Int/0");
+        for (int bitwidth = max + 1; bitwidth >= 1; bitwidth --) {
+            final String name = String.format("Int/%d", bitwidth);
+            PrimSig newsig = subInt(name);
+            subInts.put(name, newsig);
             newsig.setBitwidth(bitwidth);
-            return newsig;
-        } 
+            sig = newsig;
+        }
     }
 
     private static final PrimSig mkGhostSig() {

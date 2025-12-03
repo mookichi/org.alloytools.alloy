@@ -36,7 +36,7 @@ public class ZZDebug{
         // opt.solver = kodkod.engine.satlab.SATFactory.get("sat4j.pmax");
         // opt.solver = kodkod.engine.satlab.SATFactory.get("WCNF output");
         // opt.solver = kodkod.engine.satlab.SATFactory.get("maxsat.external");
-        opt.noOverflow = false;
+        opt.noOverflow = true;
         opt.symmetry = 20;
         opt.skolemDepth = 3;
         // solve
@@ -79,7 +79,9 @@ public class ZZDebug{
         A4Reporter rep = new A4Reporter();
         // assert(3 < 2);
         // String model = "sig Y {} 7 \n sig X extends Int/2 {}\n run {}";
-        String model = "some  sig X { var n : set Int/5}\n run {all x : X {maximal x.n; minimal x.n}} for 5 int, 3..3 steps ";
+        // String model = "sig X, Y in Int/0 {} \n run {X*X + Y*Y < 5 && maximal X + Y} for 5 int ";
+        String model = "sig X , Y in Int/0 {} \n run {maximal X ++ Y && X > Y} for 2 int";
+        // String model = "sig X , Y, Z in Int/0 {} \n run {Z = X ++ Y && maximal Z && X > Y} for 2 int";
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

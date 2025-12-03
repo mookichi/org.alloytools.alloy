@@ -372,7 +372,7 @@ public final class A4Solution {
         int min = min(), max = max();
 
         Map<String, Relation> n2r = new HashMap<>();
-        IntStream.rangeClosed(0, max + 1).forEach(i-> Sig.subInt(String.format("Int/%d", i)));
+        Sig.CreateSubInt(max);
         Sig.getSubInts().forEach((name, sig)-> {
             Relation r = Relation.unary(name);
             a2k.put(sig, r);
@@ -381,9 +381,6 @@ public final class A4Solution {
         });
 
         TupleSet tset = factory.noneOf(1);
-        Relation e0  = n2r.get("Int/0");
-        bounds.boundExactly(e0, tset);
-        subIntMap.put(e0, bounds.upperBound(e0));
         if (max >= min)
             for (int i = min; i <= max; i++) { // Safe since we know 1 <=
                                               // bitwidth <= 30
@@ -409,6 +406,9 @@ public final class A4Solution {
                     subIntMap.put(e, bounds.upperBound(e));
                 }
             }
+        Relation e0  = n2r.get("Int/0");
+        bounds.boundExactly(e0, tset);
+        subIntMap.put(e0, bounds.upperBound(e0));
         this.sigintBounds = sigintBounds.unmodifiableView();
         this.seqidxBounds = seqidxBounds.unmodifiableView();
         bounds.boundExactly(KK_NEXT, next);

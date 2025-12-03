@@ -863,6 +863,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
     public Object visit(ExprUnary x) throws Err {
         switch (x.op) {
             case EXACTLYOF :
+            case SOMEOF :
             case LONEOF :
             case ONEOF :
             case SETOF :

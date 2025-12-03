@@ -1862,19 +1862,25 @@ public final class SimpleGUI implements ComponentListener, Listener {
                 int bitwidth = e.getBitwidth() == 0 ? ans.getBitwidth() : e.getBitwidth();
                 final List<PrimSig> et = e.type().fold().get(0);
                 if (et.size() == 1 && e.type().is_small_int()) {
-                    return String.format("'%+d'", Long.parseLong(ret));
+                    return String.format("%+d", Long.parseLong(ret));
+                } else if (et.size() == 1 && bitwidth >= 0) {
+                    Long val = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).mapToInt(X->Integer.parseInt(X))
+                        .mapToLong(X-> (X == bitwidth - 1 ? -1L : 1L)<< X).sum();
+                    return String.format("%+d", val);
                 } else if (ret.matches("true|false")) {
                     return ret;
                 } else if (et.size() > 1 && e.getBitwidth() >=0) {
                     if (e.type().fold().get(0).get(e.type().arity() - 1).getBitwidth() >= 0) {
-                        return Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("->(?!.*->)"))
+                        String tab = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("->(?!.*->)"))
                             .collect(Collectors.groupingBy(
                                 x->  x[0],
                                 Collectors.mapping(
                                     x-> Integer.parseInt(x[1]), 
                                     Collectors.summingLong(x-> (x == bitwidth - 1 ? -1L : 1L)<< x)
                                 )
-                            )).toString().replaceAll("=", "->");      
+                            )).entrySet().stream().map(X-> String.format("%s->%+d", X.getKey(), X.getValue()))
+                                .collect(Collectors.joining(", "));
+                            return String.format("{%s}", tab);   
                     } else if (e.type().fold().get(0).get(0).getBitwidth() >= 0) {
                         String tab = Arrays.stream(ret.replaceAll("[{}\\s]", "").split(",")).map(x->x.split("(?<!->.*)->"))
                             .collect(Collectors.groupingBy(

@@ -869,7 +869,7 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case SETOF :
             return cset(x.sub);
             case NOOP :
-                if (x.sub.getPriority() != 0) {
+                if (x.sub.getPriority() != 0L) {
                     final Node ret = (Node) visitThis(x.sub);
                     ret.setPriority(x.sub.getPriority()); // propagate sub-expression's maxsat priority
                     return ret;
@@ -890,10 +890,10 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case ONCE :
                 return k2pos(cform(x.sub).once(), x);
             case SOME :
-                if (x.getPriority() != 0) {
+                if (x.getPriority() != 0L) {
                     Expression ex = cset(x.sub);
                     Formula ret =  k2pos(ex.some(), x);
-                    if (x.getPriority() != 0) {
+                    if (x.getPriority() != 0L) {
                         ex.setPriority(x.getPriority());
                         ret.setPriority(x.getPriority()); //propagate maxsat priority
                     }

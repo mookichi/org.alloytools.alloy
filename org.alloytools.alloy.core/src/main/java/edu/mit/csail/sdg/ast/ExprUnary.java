@@ -110,9 +110,9 @@ public final class ExprUnary extends Expr {
                 case NOOP :
                     break;
                 case SOME :
-                    if (getPriority() > 0) {
+                    if (getPriority() > 0L) {
                         out.append("maximal ");
-                    } else if (getPriority() < 0) {
+                    } else if (getPriority() < 0L) {
                         out.append("minimal ");
                     } else {
                         out.append("some ");
@@ -241,7 +241,7 @@ public final class ExprUnary extends Expr {
          */
         public final Expr make(Pos pos, Expr sub) {
             Expr ret =  make(pos, sub, null, 0);
-            if (sub.getPriority() != 0) {
+            if (sub.getPriority() != 0L) {
                 ret.setPriority(sub.getPriority());
             }
             return ret;

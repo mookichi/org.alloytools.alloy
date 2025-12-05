@@ -28,7 +28,6 @@ import static kodkod.engine.bool.BooleanConstant.TRUE;
 import static kodkod.engine.bool.Operator.AND;
 import static kodkod.engine.bool.Operator.CONST;
 import static kodkod.engine.bool.Operator.ITE;
-import static kodkod.engine.bool.Operator.NOP;
 import static kodkod.engine.bool.Operator.NOT;
 import static kodkod.engine.bool.Operator.OR;
 import static kodkod.engine.bool.Operator.VAR;
@@ -275,14 +274,14 @@ final class CBCFactory {
 	BooleanValue assemble(BooleanAccumulator acc) {
 		final int asize = acc.size();
 		final Operator.Nary op = acc.op;
-		if (asize == 0) {
-			return op.identity();
-		} else if (op != NOP && asize == 1) {
-			return acc.iterator().next();
-		} else if (asize == 2) {
+		int sw = acc.getPriority() != 0L ? 3 : asize;
+		switch(sw) {
+		case 0 : return op.identity();
+		case 1 : return acc.iterator().next();
+		case 2 : 
 			final Iterator<BooleanValue> inputs = acc.iterator();
 			return assemble(op, inputs.next(), inputs.next());
-		} else {
+		default :
 			final int hash = op.hash((Iterator)acc.iterator());
 			if (asize > cmpMax) {
 				for(Iterator<BooleanFormula> gates = opCache(op).get(hash); gates.hasNext(); ) {
@@ -483,7 +482,7 @@ final class CBCFactory {
 		 * @requires f0.op in (AND + OR) && f1.op = ITE
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
-			assert f0.op().ordinal < 2 && (f1.op() == ITE || f1.op() == NOP );
+			assert f0.op().ordinal < 2 && (f1.op() == ITE);
 			if (f0.label() < f1.label()) // f0 created before f1
 				return cache(op, f1, f0); 
 			else

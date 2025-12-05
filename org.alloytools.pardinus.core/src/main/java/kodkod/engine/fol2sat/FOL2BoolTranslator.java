@@ -777,7 +777,7 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		final Multiplicity mult = multFormula.multiplicity();
 		
 		if (multFormula.getPriority() != 0L) { // if multFormula has maxsat priority
-			ret = child.nop(env);
+			ret = child.soft(env, multFormula.getPriority());
 			ret.setPriority(multFormula.getPriority());
 			if (multFormula.getBitwidth() >= 0) {
 				ret.setBitwidth(multFormula.getBitwidth());

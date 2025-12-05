@@ -93,8 +93,8 @@ public abstract class Expression extends Node {
      * @return this.compose(JOIN, expr)
      */
     public final Expression join(Expression expr) {
-        assert(getBitwidth() < 0 || expr.getBitwidth() <0);
-        assert(getPriority() == 0 || expr.getPriority() == 0);
+        assert(getBitwidth() < 0 || expr.getBitwidth() < 0);
+        assert(getPriority() == 0L || expr.getPriority() == 0L);
         Expression ret = compose(JOIN,expr);
         if (getBitwidth() >= 0) {
             ret.setBitwidth(getBitwidth());
@@ -102,10 +102,10 @@ public abstract class Expression extends Node {
         if (expr.getBitwidth() >= 0) {
             ret.setBitwidth(expr.getBitwidth());
         }
-        if (getPriority()!= 0 ) {
+        if (getPriority() != 0L ) {
             ret.setPriority(getPriority());
         }
-        if (expr.getPriority()!= 0 ) {
+        if (expr.getPriority() != 0L ) {
             ret.setPriority(expr.getPriority());
         }
         return ret;
@@ -520,7 +520,7 @@ public abstract class Expression extends Node {
      */
     public final Formula apply(Multiplicity mult) {
         Formula ret = new  MultiplicityFormula(mult, this);
-        if (getPriority() != 0 && getBitwidth() >=0) { // minimal/maximal over integer case
+        if (getPriority() != 0L && getBitwidth() >=0L) { // minimal/maximal over integer case
             ret.setBitwidth(getBitwidth());
         }
         return ret;

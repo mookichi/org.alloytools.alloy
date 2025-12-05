@@ -671,7 +671,7 @@ public final class CompModule extends Browsable implements Module {
         @Override
         public Expr visit(ExprUnary x) throws Err {
             Expr ex = x.op.make(x.pos, visitThis(x.sub));
-            if (x.getPriority() != 0) {
+            if (x.getPriority() != 0L) {
                 ex.setPriority(x.getPriority());
             }
             return ex;

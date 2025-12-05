@@ -607,7 +607,7 @@ public abstract class AbstractReplacer implements ReturnVisitor<Expression, Form
 		if (multFormula.getBitwidth() >= 0) {
 			ret.setBitwidth(multFormula.getBitwidth());
 		}
-		if (multFormula.getPriority() != 0) {
+		if (multFormula.getPriority() != 0L) {
 			ret.setPriority(multFormula.getPriority());
 		}
 		return cache(multFormula,ret);

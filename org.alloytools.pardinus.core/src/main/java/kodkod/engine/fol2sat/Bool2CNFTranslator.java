@@ -31,7 +31,6 @@ import kodkod.engine.bool.ITEGate;
 import kodkod.engine.bool.MultiGate;
 import kodkod.engine.bool.NotGate;
 import kodkod.engine.bool.Operator;
-import kodkod.engine.bool.Operator.Nary;
 import kodkod.engine.satlab.SATFactory;
 import kodkod.engine.satlab.SATSolver;
 import kodkod.engine.satlab.WTargetSATSolver;
@@ -235,7 +234,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 	 * its input literal, as described above.
 	 */
 	public final int[] visit(MultiGate multigate, Object arg) {  
-		if (multigate.getPriority() != 0 && !(solver instanceof WTargetSATSolver)) {
+		if (multigate.getPriority() != 0L && !(solver instanceof WTargetSATSolver)) {
 			throw new IllegalStateException(
 					"To use minimal/maximal operator, the solver should be a MaxSAT solver!");
 		}
@@ -252,22 +251,22 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 			int i = 0;
 			int pos = 0;
 			for(BooleanFormula input : multigate) {
-				int iLit = input.accept(this, arg)[0];
-				if (p) {
+				int iLit = input.accept(this, multigate.getPriority() == 0L ? Boolean.FALSE : Boolean.TRUE)[0];
+				if (p || Boolean.TRUE == arg) {
 					solver.addClause(clause(iLit * sgn, output));
 				}
-				if (n) { 
-					if (multigate.getPriority() != 0) {
+				if (n || Boolean.TRUE == arg) { 
+					if (multigate.getPriority() != 0L) {
 						// if multigate has maxsat priority
 						if (multigate.getBitwidth() >= 0) {
-							long w = (pos  == multigate.size() - 1 ? -1L : 1L)<< pos;
-							if (multigate.getPriority() < 0) { // minimal
-								((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority() * w);
+							final int  wsgn = (pos  == multigate.size() - 1 ? -1 : 1);
+							if (multigate.getPriority() < 0L) { // minimal
+								((WTargetSATSolver) solver).addWeight(-wsgn * iLit, -multigate.getPriority() * (1L<< pos));
 							} else { // maximal
-								((WTargetSATSolver) solver).addWeight(iLit, multigate.getPriority() * w);
+								((WTargetSATSolver) solver).addWeight(wsgn * iLit, multigate.getPriority() * (1L<< pos));
 							}
 						} else {
-							if (multigate.getPriority() < 0) { // minimal
+							if (multigate.getPriority() < 0L) { // minimal
 								((WTargetSATSolver) solver).addWeight(-iLit, -multigate.getPriority());
 							} else { // maximal
 								((WTargetSATSolver) solver).addWeight(iLit, multigate.getPriority());
@@ -279,7 +278,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 				}
 				pos ++;
 			}
-			if (n && multigate.getPriority() == 0) {
+			if (n && multigate.getPriority() == 0L) {
 				lastClause[i] = oLit * sgn;
 				solver.addClause(lastClause);
 			}
@@ -303,13 +302,13 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 			final int t = itegate.input(1).accept(this, arg)[0];
 			final int e = itegate.input(2).accept(this, arg)[0];
 			final boolean p = positive(oLit), n = negative(oLit);
-			if (p) {
+			if (p || Boolean.TRUE == arg) {
 				solver.addClause(clause(-i, t, -oLit));
 				solver.addClause(clause(i, e, -oLit));
 				// redundant clause that strengthens unit propagation
 				solver.addClause(clause(t, e, -oLit));
 			}
-			if (n) {
+			if (n || Boolean.TRUE == arg) {
 				solver.addClause(clause(-i, -t, oLit));	
 				solver.addClause(clause(i, -e, oLit));
 				// redundant clause that strengthens unit propagation

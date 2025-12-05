@@ -82,24 +82,6 @@ public abstract class Operator implements Comparable<Operator>{
 		/** @return AND */
 		public Nary complement() {  return AND; }
 	};
-		
-	/**
-	 * N-ary {@link MultiGate NOP} operator.
-	 */
-	public static final Nary NOP = new Nary(2) {
-		public String toString() { return ","; }
-		/** @return true */
-		public BooleanConstant identity() { return BooleanConstant.TRUE; }
-		/** @return false */
-		public BooleanConstant shortCircuit() { 
-			// throw new UnsupportedOperationException();
-			return null;
-		}
-		/** @return OR */
-		public Nary complement() {
-			throw new UnsupportedOperationException();
-		}
-	};
 
 	/**
 	 * Ternary {@link ITEGate if-then-else} operator.

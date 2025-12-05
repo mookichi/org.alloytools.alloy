@@ -54,7 +54,7 @@ public final class MultiplicityFormula extends Formula {
         if (expression.getBitwidth() >= 0) {
             setBitwidth(expression.getBitwidth());
         }
-        if (expression.getPriority() != 0) {
+        if (expression.getPriority() != 0L) {
             setPriority(expression.getPriority());
         }
     }
@@ -92,9 +92,9 @@ public final class MultiplicityFormula extends Formula {
       * @see kodkod.ast.Node#toString()
       */
     public String toString() {
-        if (getPriority() > 0) {
+        if (getPriority() > 0L) {
             return "maximal " + expression;
-        } else if (getPriority() < 0) {
+        } else if (getPriority() < 0L) {
             return "minimal " + expression;
         }
         return multiplicity + " " + expression;

@@ -269,7 +269,7 @@ public class LTL2FOLTranslator extends AbstractReplacer {
 		pushVariable();
 		Formula e = unaryTempFormula.formula().accept(this);
 		Formula rt = getQuantifier(getOperator(), e);
-		if (unaryTempFormula.getPriority() != 0) {
+		if (unaryTempFormula.getPriority() != 0L) {
 			rt.setPriority(unaryTempFormula.getPriority());
 		}
 		popOperator();

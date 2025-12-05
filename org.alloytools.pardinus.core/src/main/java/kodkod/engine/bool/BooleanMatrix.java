@@ -25,12 +25,9 @@ import static kodkod.engine.bool.BooleanConstant.FALSE;
 import static kodkod.engine.bool.BooleanConstant.TRUE;
 import static kodkod.engine.bool.Operator.AND;
 import static kodkod.engine.bool.Operator.OR;
-import static kodkod.engine.bool.Operator.NOP;
 
 import java.util.Iterator;
-import java.util.stream.StreamSupport;
 
-import kodkod.ast.MultiplicityFormula;
 import kodkod.engine.fol2sat.Environment;
 import kodkod.util.collections.Containers;
 import kodkod.util.ints.ArraySequence;
@@ -949,8 +946,11 @@ public final class BooleanMatrix implements Iterable<IndexedEntry<BooleanValue>>
     /**
      * [mookichi] Virtual constraint for maxsat.
      */
-    public final BooleanValue nop(Environment<?, ?> env) {
-        final BooleanAccumulator g = BooleanAccumulator.treeGate(NOP);
+    public final BooleanValue soft(Environment<?, ?> env, long priority) {
+        final BooleanAccumulator g = BooleanAccumulator.treeGate(OR);
+        if (priority != 0) {
+            g.setPriority(priority);
+        }
         for(IndexedEntry<BooleanValue> e : cells) {
             g.add(e.value());
         }

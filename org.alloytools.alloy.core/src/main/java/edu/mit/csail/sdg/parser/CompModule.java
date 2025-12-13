@@ -88,6 +88,7 @@ import edu.mit.csail.sdg.ast.Sig;
 import edu.mit.csail.sdg.ast.Sig.Field;
 import edu.mit.csail.sdg.ast.Sig.PrimSig;
 import edu.mit.csail.sdg.ast.Sig.SubsetSig;
+import kodkod.engine.bool.Operator;
 import edu.mit.csail.sdg.ast.Type;
 import edu.mit.csail.sdg.ast.VisitQuery;
 import edu.mit.csail.sdg.ast.VisitQueryOnce;
@@ -544,7 +545,11 @@ public final class CompModule extends Browsable implements Module {
                     return x.op.make(x.pos, x.closingBracket, left, right);
                 return process(x.pos, x.closingBracket, right.pos, ((ExprChoice) right).choices, ((ExprChoice) right).reasons, left);
             }
-            return x.op.make(x.pos, x.closingBracket, left, right);
+            Expr ret =  x.op.make(x.pos, x.closingBracket, left, right);
+            if (x.getPriority() != 0) {
+                ret.setPriority(x.getPriority());
+            }
+            return ret;
         }
 
         /** {@inheritDoc} */
@@ -662,8 +667,14 @@ public final class CompModule extends Browsable implements Module {
                 Expr instantiated = macro.instantiate(this, warns);
                 Expr res = ExprUnary.Op.NOOP.make(x.pos, instantiated);
                 res.setReferenced(new Clause.Custom(macro.pos, macro.toString()));
+                if (x.getBitwidth() >= 0) {
+                    res.setBitwidth(x.getBitwidth());
+                }
                 return res;
             } else
+                if (x.getBitwidth() >= 0) {
+                    obj.setBitwidth(x.getBitwidth());
+                }
                 return obj;
         }
 
@@ -1863,6 +1874,15 @@ public final class CompModule extends Browsable implements Module {
     /** Add a FACT declaration. */
     void addFact(Pos pos, String name, Expr value) throws Err {
         status = 3;
+        if (value.getPriority() != 0 && value instanceof ExprUnary) {
+            ExprUnary eu = (ExprUnary) value;
+            if (eu.op == ExprUnary.Op.NOOP && eu.sub instanceof ExprList) {
+                ExprList el = (ExprList) eu.sub;
+                    for (var f : el.args) {
+                        f.setPriority(value.getPriority());
+                    }
+            }
+        } 
         if (name == null || name.length() == 0)
             name = "fact$" + (1 + facts.size());
         facts.add(new Pair<String,Expr>(name, ExprUnary.Op.NOOP.make(value.span().merge(pos), value)));

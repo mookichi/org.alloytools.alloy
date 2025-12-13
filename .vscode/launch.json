@@ -58,7 +58,7 @@
             "name": "SimpleGUI",
             "request": "launch",
             "mainClass": "edu.mit.csail.sdg.alloy4whole.SimpleGUI",
-            // "vmArgs": "-ea",
+            "args": "--debug",
             "projectName": "org.alloytools.alloy.application"
         },
         {

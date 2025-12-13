@@ -411,7 +411,8 @@ final class CBCFactory {
 			final int label = f1.label();
 			if (f0.contains(f0.op(), label, cmpMax) > 0) 
 				return op==f0.op() ? f0 : f1;
-			else if (op==f0.op() && f0.contains(op, -label, cmpMax)>0) 
+			else if (f0.getPriority() == 0 && f1.getPriority() == 0 && 
+				op==f0.op() && f0.contains(op, -label, cmpMax)>0) 
 				return op.shortCircuit();
 			else 
 				return cache(op, f0, f1);
@@ -501,7 +502,7 @@ final class CBCFactory {
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
 			assert f0.op().ordinal < 2 && f1.op() == NOT;
-			if (f0.label()==-f1.label()) return op.shortCircuit();
+			if (f0.getPriority() == 0 && f1.getPriority() == 0 && f0.label()==-f1.label()) return op.shortCircuit();
 			else if (f0.label() < StrictMath.abs(f1.label()))  // f0 created before f1
 				return NoX.assemble(op, f1, f0);
 			else 
@@ -536,7 +537,7 @@ final class CBCFactory {
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
 			assert (f0.op() == ITE) && f1.op() == NOT;
-			if (f0.label()==-f1.label()) return op.shortCircuit();
+			if (f0.getPriority() == 0 && f1.getPriority() == 0 && f0.label()==-f1.label()) return op.shortCircuit();
 			else if (f0.label() < StrictMath.abs(f1.label()))  // f0 created before f1
 				return NoX.assemble(op, f1, f0);
 			else 
@@ -558,7 +559,8 @@ final class CBCFactory {
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
 			assert f0.op() == NOT ;
 			final int label = f1.label();
-			if (f0.input(0).contains(op.complement(), label, cmpMax)>0) return op.shortCircuit();
+			if (f0.getPriority() == 0 && f1.getPriority() == 0 && 
+					f0.input(0).contains(op.complement(), label, cmpMax)>0) return op.shortCircuit();
 			else if (f0.input(0).contains(op.complement(), -label, cmpMax)>0) return f0;
 			else return cache(op, f0, f1);
 		}
@@ -594,7 +596,7 @@ final class CBCFactory {
 		 */
 		BooleanValue assemble(Nary op, BooleanFormula f0, BooleanFormula f1) {
 			assert f0.op() == NOT && f1.op() == VAR;
-			if (f0.label()==-f1.label()) return op.shortCircuit();
+			if (f0.getPriority() == 0 && f1.getPriority() == 0 && f0.label()==-f1.label()) return op.shortCircuit();
 			else return NoX.assemble(op, f0, f1);
 		}
 	};

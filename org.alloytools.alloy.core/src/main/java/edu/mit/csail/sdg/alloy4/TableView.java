@@ -179,12 +179,12 @@ public class TableView {
             if (instanceTuples != null) {
 
                 List<SimTuple> instancesArray = Util.toList(instanceTuples);
-                sortTuple(instancesArray);
+                 sortTuple(instancesArray);
 
                 SimTupleset sigInstances = SimTupleset.make(instancesArray);
 
                 final  int bitwidth = s.getBitwidth() == 0 ? instance.ints().size() : s.getBitwidth();
-                Table table = new Table(bitwidth >= 0 ? 2 : sigInstances.size() + 1, s.getFields().size() + 1, 1);
+                Table table = new Table(bitwidth >= 0 || sigInstances.size() == 0 ? 2 : sigInstances.size() + 1, s.getFields().size() + 1, 1);
                 table.set(0, 0, bitwidth >= 0 ? String.format("%s::Int/%d", s.label, bitwidth) : s.label);
 
                 // if (s.getFields().size() == 0 && sigInstances.size() < 1 &&  bitwidth < 0)
@@ -201,7 +201,7 @@ public class TableView {
 
 
                 if (sigInstances.size() == 0) {
-                        table.set(r, 0, bitwidth >= 0 ? "+0" : "");
+                        table.set(r, 0, bitwidth >= 0 ? "+0" : "-");
                         continue;
                 }
                 for (SimTuple sigInstance : sigInstances) {
@@ -221,33 +221,36 @@ public class TableView {
 
                         SimTupleset relations = Util.toSimTupleset(solution.eval(f, state));
                         SimTupleset joined = leftJoin.join(relations);
+                        final List<PrimSig> et = f.type().fold().get(0);
+                        PrimSig intSig = et.stream().skip(1).filter(X-> X.getBitwidth() > 0).findFirst().orElse(null);
+                        final int idx = et.indexOf(intSig) - 1;
                         final int bitwidth_f = f.getBitwidth() == 0 ? instance.ints().size() : f.getBitwidth();
                         if (bitwidth_f >= 0) {
                             final var jstream = StreamSupport.stream(joined.spliterator(), false);
                             if (joined.arity() == 1) {
                                 Long val = jstream.mapToInt(X->X.get(0).toInt(0)).mapToLong(X->(X == bitwidth_f - 1 ? -1L : 1L)<< X).sum();
                                 table.set(r, c++, String.format("%+d", val));
-                            } else if (f.type().fold().get(0).get(1).getBitwidth() >= 0) {
-                                final Function<SimTuple, String> kfun = x->x.tail(joined.arity() - 1).toString();
+                            } else {
+                                final Function<SimTuple, SimTuple> kfun = X-> SimTuple.make(
+                                    StreamSupport.stream(X.spliterator(), false).filter(A-> ! A.equals(X.get(idx))).toList()
+                                );
                                 final Collector<SimTuple, ?, Long> col = Collectors.mapping(
-                                    (SimTuple X)-> X.tail().toInt(0), 
+                                    (SimTuple X)-> X.get(idx).toInt(0), 
                                     Collectors.summingLong(X-> (X == bitwidth_f - 1 ? -1L : 1L)<< X)
                                 );
-                                final Collector<SimTuple, ? ,Map<String,Long>> grp = Collectors.groupingBy(kfun, col);
-                                Map<String,Long> ans = jstream.collect(grp);
-                                String tab = ans.entrySet().stream().map(X-> String.format("%+d->%s", X.getValue(), X.getKey()))
-                                    .collect(Collectors.joining(", "));
-                                table.set(r, c++, toTable(String.format("{%s}", tab), false));
-                            } else if (f.type().fold().get(0).get(joined.arity()).getBitwidth() >= 0) {
-                                final Function<SimTuple, String> kfun = x->x.head(joined.arity() - 1).toString();
-                                final Collector<SimTuple, ?, Long> col = Collectors.mapping(
-                                    (SimTuple X)-> X.head().toInt(0), 
-                                    Collectors.summingLong(X-> (X == bitwidth_f - 1 ? -1L : 1L)<< X)
-                                );
-                                final Collector<SimTuple, ? ,Map<String,Long>> grp = Collectors.groupingBy(kfun, col);
-                                Map<String,Long> ans = jstream.collect(grp);
-                                String tab = ans.entrySet().stream().map(X-> String.format("%s->%+d", X.getKey(), X.getValue()))
-                                    .collect(Collectors.joining(", "));
+                                final Collector<SimTuple, ? ,Map<SimTuple,Long>> grp = Collectors.groupingBy(kfun, col);
+                                final Map<SimTuple,Long> ans = jstream.collect(grp);
+                                final String tab = ans.keySet().stream().map(X-> {
+                                    StringJoiner sj = new StringJoiner("->");
+                                    if (idx > 0) {
+                                        sj.add(X.head(idx).toString());
+                                    }
+                                    sj.add(String.format("%+d", ans.get(X)));
+                                    if (idx < joined.arity() - 1) {
+                                        sj.add(X.tail(joined.arity() - 1 - idx).toString());
+                                    }
+                                    return sj.toString();
+                                }).collect(Collectors.joining(", "));
                                 table.set(r, c++, toTable(String.format("{%s}", tab), false));
                             }
                             // long val = StreamSupport.stream(joined.spliterator(), false).mapToInt(X-> X.get(0).toInt(0))

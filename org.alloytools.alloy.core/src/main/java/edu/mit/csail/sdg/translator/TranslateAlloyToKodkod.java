@@ -669,8 +669,12 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
         if (!x.errors.isEmpty())
             throw x.errors.pick();
         Object y = visitThis(x);
-        if (y instanceof Formula)
+        if (y instanceof Formula) {
+            if (x.getPriority() != 0L) {
+                ((Formula)y).setPriority(x.getPriority());
+            }
             return (Formula) y;
+        }
         throw new ErrorFatal(x.span(), "This should have been a formula.\nInstead it is " + y);
     }
 
@@ -890,16 +894,17 @@ public final class TranslateAlloyToKodkod extends VisitReturn<Object> {
             case ONCE :
                 return k2pos(cform(x.sub).once(), x);
             case SOME :
+                return k2pos(cset(x.sub).some(), x);
+            case SOFT :
                 if (x.getPriority() != 0L) {
                     Expression ex = cset(x.sub);
-                    Formula ret =  k2pos(ex.some(), x);
+                    Formula ret =  k2pos(ex.soft(), x);
                     if (x.getPriority() != 0L) {
                         ex.setPriority(x.getPriority());
                         ret.setPriority(x.getPriority()); //propagate maxsat priority
                     }
                     return ret;
                 }
-                return k2pos(cset(x.sub).some(), x);
             case LONE :
                 return k2pos(cset(x.sub).lone(), x);
             case ONE :

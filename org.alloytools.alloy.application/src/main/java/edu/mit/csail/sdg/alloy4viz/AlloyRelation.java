@@ -73,18 +73,6 @@ public final class AlloyRelation extends AlloyElement {
      */
     public final boolean               isSkolem;
 
-    /** Records the bitwidth of this relation, or -1 if it is not a bitvector */
-    private int bitwidth = -1; 
-
-    /** Sets the bitwidth of this relation */
-    public void setBitwidth(int val) {
-        bitwidth = val;
-    }
-    /** Returns the bitwidth of this relation, or -1 if it is not a bitvector */
-    public int getBitwidth() {
-        return bitwidth;
-    }   
-
     /**
      * Constructs a new AlloyRelation with that name and that list of types;
      * types.size() must be 2 or above.

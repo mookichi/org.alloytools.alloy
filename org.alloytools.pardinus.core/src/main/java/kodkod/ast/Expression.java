@@ -39,11 +39,9 @@ import static kodkod.ast.operator.Multiplicity.LONE;
 import static kodkod.ast.operator.Multiplicity.NO;
 import static kodkod.ast.operator.Multiplicity.ONE;
 import static kodkod.ast.operator.Multiplicity.SOME;
-import static kodkod.ast.operator.TemporalOperator.ALWAYS;
-import static kodkod.ast.operator.TemporalOperator.EVENTUALLY;
+import static kodkod.ast.operator.Multiplicity.SOFT;
 import static kodkod.ast.operator.TemporalOperator.PRIME;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -483,6 +481,15 @@ public abstract class Expression extends Node {
      */
     public final Formula some() {
         return apply(SOME);
+    }
+    
+    /**
+     * Returns the formula 'some this'.  The effect of this method is the same as calling
+     * this.apply(SOFT).
+     * @return this.apply(SOFT)
+     */
+    public final Formula soft() {
+        return apply(SOFT);
     }
     
     /**

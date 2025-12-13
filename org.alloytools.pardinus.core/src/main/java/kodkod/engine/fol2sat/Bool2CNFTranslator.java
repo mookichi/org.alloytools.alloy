@@ -28,6 +28,7 @@ import kodkod.engine.bool.BooleanFormula;
 import kodkod.engine.bool.BooleanVariable;
 import kodkod.engine.bool.BooleanVisitor;
 import kodkod.engine.bool.ITEGate;
+import kodkod.engine.bool.Int;
 import kodkod.engine.bool.MultiGate;
 import kodkod.engine.bool.NotGate;
 import kodkod.engine.bool.Operator;
@@ -172,18 +173,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 //		System.out.println("solver.vars=" + solver.numberOfVariables());
 		if (newVars > 0)
 			solver.addVariables(newVars);
-		
-		if (circuit.op()==Operator.AND) { 
-			for(BooleanFormula input : circuit) { 
-				input.accept(this, null);
-			}
-			for(BooleanFormula input : circuit) { 
-				unaryClause[0] = input.label();
-				solver.addClause(unaryClause);
-			}
-		} else {
-			solver.addClause(circuit.accept(this, null));
-		}
+		solver.addClause(circuit.accept(this, null));
 		return this;
 	}
 	
@@ -246,14 +236,25 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 			} else { // multigate.op()==OR
 				sgn = -1; n = positive(oLit); p = negative(oLit);
 			}
-			final int[] lastClause = n ? new int[multigate.size()+1] : null;
+			final int[] lastClause = (n || Boolean.TRUE == arg) ? new int[multigate.size()+1] : null;
 			final int output = oLit * -sgn;
 			int i = 0;
 			int pos = 0;
 			for(BooleanFormula input : multigate) {
-				int iLit = input.accept(this, multigate.getPriority() == 0L ? Boolean.FALSE : Boolean.TRUE)[0];
+				int[] cls = input.accept(this, (Boolean) (multigate.getPriority() != 0L));
+				if (cls.length == 0) {
+					// soft leaf
+					continue;
+				}
+				int iLit = cls[0];
 				if (p || Boolean.TRUE == arg) {
-					solver.addClause(clause(iLit * sgn, output));
+					if (input.getPriority() > 0) {
+						((WTargetSATSolver) solver).addWeight(iLit, input.getPriority());
+					} else if (input.getPriority() < 0) {
+						((WTargetSATSolver) solver).addWeight(-iLit, -input.getPriority());
+					} else {
+						solver.addClause(clause(iLit * sgn, output));
+					}
 				}
 				if (n || Boolean.TRUE == arg) { 
 					if (multigate.getPriority() != 0L) {
@@ -278,7 +279,7 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 				}
 				pos ++;
 			}
-			if (n && multigate.getPriority() == 0L) {
+			if (n && multigate.getPriority() == 0L && lastClause[0] != 0) {
 				lastClause[i] = oLit * sgn;
 				solver.addClause(lastClause);
 			}
@@ -323,7 +324,23 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 	 * @return o: int[] | o.length = 1 && o[0] = - translate(negation.inputs)[0]
 	 * */
 	public final int[] visit(NotGate negation, Object arg) {
-		return clause(-negation.input(0).accept(this, arg)[0]);
+		int[] cls = negation.input(0).accept(this, (Boolean) (negation.getPriority() != 0));
+		if (cls.length == 0) {
+			return cls;
+		}
+		if (negation.getPriority() != 0L && !(solver instanceof WTargetSATSolver)) {
+			throw new IllegalStateException(
+					"To use minimal/maximal operator, the solver should be a MaxSAT solver!");
+		}
+		int sgn = negation.label() > 0 ? -1 : 1;
+		if (sgn * negation.getPriority() > 0) {
+			((WTargetSATSolver) solver).addWeight(negation.label(), sgn * negation.getPriority());
+			return new int[0];
+		} else if (sgn * negation.getPriority() < 0) {
+			((WTargetSATSolver) solver).addWeight(negation.label(), -sgn * negation.getPriority());
+			return new int[0];
+		}
+		return new int[] {-cls[0]};
 	}
 
 	/**
@@ -331,6 +348,18 @@ abstract class Bool2CNFTranslator implements BooleanVisitor<int[], Object> {
 	 * @return o: int[] | o.length = 1 && o[0] = variable.literal
 	 */
 	public final int[] visit(BooleanVariable variable, Object arg) {
+		if (variable.getPriority() != 0L && !(solver instanceof WTargetSATSolver)) {
+			throw new IllegalStateException(
+					"To use minimal/maximal operator, the solver should be a MaxSAT solver!");
+		}
+		int sgn = variable.label() > 0 ? 1 : -1;
+		if (sgn * variable.getPriority() > 0) {
+			((WTargetSATSolver) solver).addWeight(variable.label(), sgn * variable.getPriority());
+			return new int[0];
+		} else if (sgn * variable.getPriority() < 0) {
+			((WTargetSATSolver) solver).addWeight(variable.label(), -sgn * variable.getPriority());
+			return new int[0];
+		}
 		return clause(variable.label());
 	}
 

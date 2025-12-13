@@ -107,12 +107,14 @@ public final class BooleanAccumulator extends BooleanValue implements Iterable<B
 		if (isShortCircuited()) return op.shortCircuit(); 
 		else{ 
 			final int lit = v.label();
-			if (v==op.shortCircuit() || inputs.containsIndex(-lit)) {
+			if (v==op.shortCircuit() || v.getPriority() == 0 && inputs.containsIndex(-lit)) {
 				inputs.clear();
 				inputs.put(op.shortCircuit().label, op.shortCircuit());
 				return op.shortCircuit();
 			} 
-			if (v!=op.identity() && !inputs.containsIndex(lit)) { inputs.put(lit, (BooleanValue) v);	}
+			if (v!=op.identity() && !(v.getPriority() == 0 && inputs.containsIndex(lit))) {
+				 inputs.put(lit, (BooleanValue) v);	
+			}
 //			if (v==op.shortCircuit()) {
 //				inputs.clear();
 //				inputs.add(op.shortCircuit());

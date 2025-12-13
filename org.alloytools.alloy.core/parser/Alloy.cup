@@ -651,6 +651,9 @@ Spec ::= Spec Vis:p ENUM:o Name:a LBRACE         RBRACE:c                      {
 Spec ::= Spec       FACT:o          Super:e {:         parser.alloymodule.addFact      (o , ""       , e); :};
 Spec ::= Spec       FACT:o   Name:n Super:e {: nod(n); parser.alloymodule.addFact      (o , n.label  , e); :};
 Spec ::= Spec       FACT:o   STR:n  Super:e {:         parser.alloymodule.addFact      (o , n.string , e); :};
+Spec ::= Spec       FACT:o LBRACKET NUMBER:w RBRACKET         Super:e {: e.setPriority(w.num); parser.alloymodule.addFact      (o , ""       , e); :};
+Spec ::= Spec       FACT:o LBRACKET NUMBER:w RBRACKET  Name:n Super:e {: e.setPriority(w.num); nod(n); parser.alloymodule.addFact      (o , n.label  , e); :};
+Spec ::= Spec       FACT:o LBRACKET NUMBER:w RBRACKET  STR:n  Super:e {: e.setPriority(w.num); parser.alloymodule.addFact      (o , n.string , e); :};
 Spec ::= Spec       ASSERT:o        Super:e {:         parser.alloymodule.addAssertion (o , null , ""       , e); :};
 Spec ::= Spec       ASSERT:o Name:n Super:e {: nod(n); parser.alloymodule.addAssertion (o , n.pos, n.label  , e); :};
 Spec ::= Spec       ASSERT:o STR:n  Super:e {:         parser.alloymodule.addAssertion (o , null,  n.string , e); :};
@@ -1006,10 +1009,10 @@ CompareExprA ::= SOME:o ShiftExprA:b                        {: RESULT=ExprUnary.
 CompareExprA ::= LONE:o ShiftExprA:b                        {: RESULT=ExprUnary.Op.LONE .make(o, b);   :};
 CompareExprA ::= ONE:o  ShiftExprA:b                        {: RESULT=ExprUnary.Op.ONE  .make(o, b);   :};
 CompareExprA ::= SET:o  ShiftExprA:b                        {: RESULT=ExprUnary.Op.SETOF.make(o, b);   :};
-CompareExprA ::= MINIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprA:b                        {: b.setPriority(-w.num); RESULT=ExprUnary.Op.SOME.make(o, b); :};
-CompareExprA ::= MAXIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprA:b                        {: b.setPriority(w.num); RESULT=ExprUnary.Op.SOME.make(o, b); :};
-CompareExprA ::= MINIMAL:o  ShiftExprA:b                        {: b.setPriority(-1L); RESULT=ExprUnary.Op.SOME.make(o, b); :};
-CompareExprA ::= MAXIMAL:o  ShiftExprA:b                        {: b.setPriority(1L); RESULT=ExprUnary.Op.SOME.make(o, b); :};
+CompareExprA ::= MINIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprA:b                        {: b.setPriority(-w.num); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
+CompareExprA ::= MAXIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprA:b                        {: b.setPriority(w.num); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
+CompareExprA ::= MINIMAL:o  ShiftExprA:b                        {: b.setPriority(-1L); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
+CompareExprA ::= MAXIMAL:o  ShiftExprA:b                        {: b.setPriority(1L); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
 CompareExprA ::= SEQ:o  ShiftExprA:b                        {: RESULT=ExprBinary.Op.ISSEQ_ARROW_LONE.make(o, null, ExprVar.make(o, "seq/Int"), b); parser.alloymodule.addSeq(o); :};
 CompareExprA ::=        ShiftExprA:b                        {: RESULT=b;                               :};
 
@@ -1030,10 +1033,10 @@ CompareExprB ::= SOME:o ShiftExprB:b                        {: RESULT=ExprUnary.
 CompareExprB ::= LONE:o ShiftExprB:b                        {: RESULT=ExprUnary.Op.LONE .make(o, b);   :};
 CompareExprB ::= ONE:o  ShiftExprB:b                        {: RESULT=ExprUnary.Op.ONE  .make(o, b);   :};
 CompareExprB ::= SET:o  ShiftExprB:b                        {: RESULT=ExprUnary.Op.SETOF.make(o, b);   :};
-CompareExprB ::= MINIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprB:b                        {: b.setPriority(-w.num); RESULT=ExprUnary.Op.SOME.make(o, b); :};
-CompareExprB ::= MAXIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprB:b                        {: b.setPriority(w.num); RESULT=ExprUnary.Op.SOME.make(o, b); :};
-CompareExprB ::= MINIMAL:o  ShiftExprB:b                        {: b.setPriority(-1L); RESULT=ExprUnary.Op.SOME.make(o, b); :};
-CompareExprB ::= MAXIMAL:o  ShiftExprB:b                        {: b.setPriority(1L); RESULT=ExprUnary.Op.SOME.make(o,b); :};
+CompareExprB ::= MINIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprB:b                        {: b.setPriority(-w.num); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
+CompareExprB ::= MAXIMAL:o  LBRACKET NUMBER:w RBRACKET ShiftExprB:b                        {: b.setPriority(w.num); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
+CompareExprB ::= MINIMAL:o  ShiftExprB:b                        {: b.setPriority(-1L); RESULT=ExprUnary.Op.SOFT.make(o, b); :};
+CompareExprB ::= MAXIMAL:o  ShiftExprB:b                        {: b.setPriority(1L); RESULT=ExprUnary.Op.SOFT.make(o,b); :};
 CompareExprB ::= SEQ:o  ShiftExprB:b                        {: RESULT=ExprBinary.Op.ISSEQ_ARROW_LONE.make(o, null, ExprVar.make(o,"seq/Int"), b); parser.alloymodule.addSeq(o); :};
 CompareExprB ::=        ShiftExprB:b                        {: RESULT=b;                               :};
 

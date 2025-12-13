@@ -22,3 +22,4 @@ enroute.zip
 *.iml
 languageServers-log/AlloyLanguageServer.log
 _Debug2.xml
+build/reports/problems/problems-report.html

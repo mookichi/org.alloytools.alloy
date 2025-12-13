@@ -36,4 +36,17 @@ public abstract class AlloyElement implements Comparable<AlloyElement> {
     AlloyElement(String name) {
         this.name = name;
     }
+
+    /** Records the bitwidth of this relation, or -1 if it is not a bitvector */
+    private int bitwidth = -1; 
+
+    /** Sets the bitwidth of this relation */
+    public void setBitwidth(int val) {
+        bitwidth = val;
+    }
+    
+    /** Returns the bitwidth of this relation, or -1 if it is not a bitvector */
+    public int getBitwidth() {
+        return bitwidth;
+    }   
 }

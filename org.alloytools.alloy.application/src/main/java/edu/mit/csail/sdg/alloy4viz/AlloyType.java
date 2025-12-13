@@ -196,6 +196,8 @@ public final class AlloyType extends AlloyNodeElement {
         } else {
             AlloyType  subInt = new AlloyType(s, false, false, true, false, false, false, false);
             subIntType.put(s, subInt);
+            final int bitwidth = Integer.parseInt(s.split("/")[1]);
+            subInt.setBitwidth(bitwidth);
             return subInt;
         }
     }

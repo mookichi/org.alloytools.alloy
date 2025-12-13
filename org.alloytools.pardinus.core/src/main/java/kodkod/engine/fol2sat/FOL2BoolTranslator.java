@@ -24,6 +24,7 @@ package kodkod.engine.fol2sat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -272,6 +273,9 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 	 * @ensures the translation may be cached
 	 */
 	BooleanValue cache(Formula formula, BooleanValue translation) {
+		if (formula.getPriority() != 0L) {
+			translation.setPriority(formula.getPriority());
+		}
 		return cache.cache(formula, translation, env);
 	}
 	
@@ -683,10 +687,13 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		final BooleanAccumulator acc = BooleanAccumulator.treeGate(boolOp);
 		final BooleanValue shortCircuit = boolOp.shortCircuit();
 		for(Formula child : formula) { 
-			if (acc.add(child.accept(this))==shortCircuit)
+			BooleanValue ans = child.accept(this);
+			if (child.getPriority() != 0L) {
+				ans.setPriority(child.getPriority());
+			}
+			if (acc.add(ans)==shortCircuit)
 				break;
-		}
-		
+			}
 		return cache(formula, interpreter.factory().accumulate(acc));
 	}
 
@@ -715,7 +722,7 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		case IFF		: ret = f.iff(left, right); break;
 		default : 
 			throw new IllegalArgumentException("Unknown operator: " + op);
-		}
+		}	
 		return cache(binFormula, ret);
 	}
 
@@ -776,20 +783,18 @@ abstract class FOL2BoolTranslator implements ReturnVisitor<BooleanMatrix, Boolea
 		final BooleanMatrix child = multFormula.expression().accept(this);
 		final Multiplicity mult = multFormula.multiplicity();
 		
-		if (multFormula.getPriority() != 0L) { // if multFormula has maxsat priority
-			ret = child.soft(env, multFormula.getPriority());
-			ret.setPriority(multFormula.getPriority());
-			if (multFormula.getBitwidth() >= 0) {
-				ret.setBitwidth(multFormula.getBitwidth());
-			}
-			return cache(multFormula, ret);
-		}
 		switch(mult) {
-		case NO 	: ret = child.none(env); break;
-		case SOME	: ret = child.some(env); break;
-		case ONE 	: ret = child.one(env);  break;
-		case LONE 	: ret = child.lone(env); break;
-		default : 
+			case NO 	: ret = child.none(env); break;
+			case SOME	: ret = child.some(env); break;
+			case ONE 	: ret = child.one(env);  break;
+			case LONE 	: ret = child.lone(env); break;
+			case SOFT :
+				ret = child.soft(env, multFormula.getPriority());
+				if (multFormula.getBitwidth() >= 0) {
+					ret.setBitwidth(multFormula.getBitwidth());
+				}
+				break;
+			default : 
 			throw new IllegalArgumentException("Unknown multiplicity: " + mult);
 		}
 		

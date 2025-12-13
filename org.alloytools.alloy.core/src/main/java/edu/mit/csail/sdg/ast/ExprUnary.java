@@ -110,14 +110,16 @@ public final class ExprUnary extends Expr {
                 case NOOP :
                     break;
                 case SOME :
+                    out.append("some ");
+                    break;
+                case SOFT : 
                     if (getPriority() > 0L) {
                         out.append("maximal ");
                     } else if (getPriority() < 0L) {
                         out.append("minimal ");
                     } else {
-                        out.append("some ");
+                        out.append("free  ");
                     }
-                    break;
                 default :
                     out.append(op).append(' ');
             }
@@ -188,7 +190,9 @@ public final class ExprUnary extends Expr {
                     HISTORICALLY("historically"),
                     /** once f (where f is a formula) */
                     ONCE("once"),
-                    /** no x (where x is a set or relation) */
+                    /** minimal/maximal x (where x is a set or relation) */
+                    SOFT("soft"),
+                    /** some x (where x is a set or relation) */
                     NO("no"),
                     /** some x (where x is a set or relation) */
                     SOME("some"),
@@ -337,6 +341,7 @@ public final class ExprUnary extends Expr {
                             extraError = new ErrorType(sub.span(), "After the some/lone/one multiplicity symbol, " + "this expression must be a unary set.\nInstead, its possible type(s) are:\n" + sub.type);
                         break;
                     case NOT :
+                    case SOFT :
                     case NO :
                     case SOME :
                     case LONE :
@@ -433,6 +438,7 @@ public final class ExprUnary extends Expr {
                     w2 = new ErrorWarning(sub.span(), "The value of this expression does not contribute to the value of the parent.\nParent's relevant type = " + p + "\nThis expression's type = " + sub.type.extract(2));
                 break;
             case CARDINALITY :
+            case SOFT :
             case NO :
             case ONE :
             case SOME :

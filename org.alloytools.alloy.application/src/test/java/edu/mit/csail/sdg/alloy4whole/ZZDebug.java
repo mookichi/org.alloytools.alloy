@@ -82,8 +82,8 @@ public class ZZDebug{
         // String model = "sig X, Y in Int/0 {} \n run {X*X + Y*Y < 19 && maximal X + Y} for 8 int ";
         // String model = "sig X , Y in Int/0 {} \n run {maximal X ++ Y && X > Y} for 2 int";
         // String model = "sig X , Y, Z in Int/0 {} \n run {Z = X ++ Y && maximal Z && X > Y} for 2 int";
-        // String model ="sig X in Int/1 {} run {maximal X}";
-        String model = "sig A {} fun X : A->Int/5->A {A->7->A} run {} for 5 int, 2..2 A";
+        // String model ="sig X in Int/3 {} run {minimal X}";
+        String model = "sig X{}fact[31]{no X} fact[21]{one X} run{}for 2 X";
         if (args.length > 0)  
             model = args[0];
         CompModule world = CompUtil.parseEverything_fromString(rep, model);

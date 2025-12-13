@@ -17,15 +17,20 @@ package edu.mit.csail.sdg.alloy4viz;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -42,6 +47,7 @@ import edu.mit.csail.sdg.alloy4graph.Graph;
 import edu.mit.csail.sdg.alloy4graph.GraphEdge;
 import edu.mit.csail.sdg.alloy4graph.GraphNode;
 import edu.mit.csail.sdg.alloy4graph.GraphViewer;
+import edu.mit.csail.sdg.ast.Sig.PrimSig;
 
 /**
  * This utility class generates a graph for a particular index of the
@@ -417,9 +423,31 @@ public final class StaticGraphMaker {
             String attr = e.getValue();
             if (view.label.get(rel).length() > 0) {
                 if (rel.getBitwidth() >=0)  {
-                    long val = Arrays.stream(attr.split(", *")).mapToInt(x-> Integer.parseInt(x))
-                        .mapToLong(i-> (i == rel.getBitwidth() - 1 ? -1L : 1L)<< i).sum();
-                    attr = String.format("%s= %+d", view.label.get(rel), val);
+                    final var et = rel.getTypes();
+                    AlloyType intSig = et.stream().filter(X-> X.getBitwidth() > 0).findFirst().orElse(null);
+                    final int idx = et.indexOf(intSig) - 1;
+                    final int bitwidth = intSig.getBitwidth();
+                    final Stream<String[]> sts = Arrays.stream(attr.split(", *")).map(X-> X.split("->"));
+                    final Function<String[], List<String>> kfun = X-> Arrays.stream(X).filter(A-> ! A.equals(X[idx])).toList();
+                    final Collector<String[], ?, Long> col = Collectors.mapping(
+                        T-> Integer.parseInt(T[idx]),
+                        Collectors.summingLong(T-> (T == bitwidth - 1 ? -1L : 1L)<< T)
+                    );
+                    final Collector<String[], ? ,Map<List<String>,Long>> grp = Collectors.groupingBy(kfun, col);
+                    final Map<List<String>,Long> ans = sts.collect(grp);
+                    String tab = ans.keySet().stream().map(X-> {
+                        StringJoiner sj = new StringJoiner("->");
+                        final Iterator<String> ite = X.iterator();
+                        for (int i = 0; i <=X.size(); i++) {
+                            if (i == idx) {
+                                sj.add(String.format("%+d", ans.get(X)));
+                            } else {
+                                sj.add(ite.next());
+                            }
+                        }
+                        return sj.toString();
+                    }).collect(Collectors.joining(", "));
+                    attr = String.format("%s= {%s}", view.label.get(rel), tab);                    
                 } else {
                     attr = view.label.get(rel) + ": " + attr;
                 }
